@@ -20,8 +20,7 @@ import PostCardActions from "./PostCardActions";
 import OutlinedInputWithLabelWithErrors from "../Inputs/OutlinedInputWithLabelWithErrors";
 import {downloadBlob} from "../../util/firebase/storage";
 import UserAvatar from "../Avatar/UserAvatar";
-import {usePost} from "../Provides/PostProvider";
-import {useAuth} from "../Provides/AuthProvider";
+import {usePost} from "../Providers/PostProvider";
 
 const useStyles = makeStyles((theme) => ({
     editButton: {
@@ -92,16 +91,27 @@ export default function PostCard({files, id, editControls, avatar, initials, hea
     const {enqueueSnackbar} = useSnackbar();
     const {posts} = usePost();
 
+    /* State variables */
     const [postData, setPostData] = React.useState(body)
     const [edit, setEdit] = React.useState(false)
     const [errors, setErrors] = React.useState([])
     const [fileUrl, setFileUrl] = React.useState('');
     const [loading, setLoading] = React.useState(true)
 
+    /* State handlers */
     const handleFileUrlSet = (fileUrl) => setFileUrl(fileUrl)
 
     const handleLoadingUnset = () => setLoading(false)
 
+    const handleEditToggle = () => setEdit(edit => !edit);
+
+    const handlePostDataSet = (event) => setPostData(event.target.value);
+    const handlePostDataReset = () => setPostData(body);
+
+    const handleErrorsSet = (errors) => setErrors(errors);
+    const handleErrorsReset = () => setErrors([]);
+
+    /* Clean up after edit */
     React.useEffect(() => {
         if (!edit) {
             handleErrorsReset()
@@ -110,6 +120,7 @@ export default function PostCard({files, id, editControls, avatar, initials, hea
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [edit])
 
+    /* Download post image */
     React.useEffect(() => {
         const func = async () => {
             if (files.length > 0) {
@@ -123,17 +134,8 @@ export default function PostCard({files, id, editControls, avatar, initials, hea
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [posts])
 
-    const handleEditToggle = () => setEdit(edit => !edit);
-
-    const handlePostDataSet = (event) => setPostData(event.target.value);
-    const handlePostDataReset = () => setPostData(body);
-
-    const handleErrorsSet = (errors) => setErrors(errors);
-    const handleErrorsReset = () => setErrors([]);
-
-    const handleDelete = () => {
-        onDelete(id)
-    }
+    /* Event handlers */
+    const handleDelete = () => onDelete(id)
 
     const onSubmit = (event) => {
         event.preventDefault();
@@ -145,6 +147,7 @@ export default function PostCard({files, id, editControls, avatar, initials, hea
         enqueueSnackbar('Post updated', { variant: 'success' });
     }
 
+    /* Header button data */
     const headerButtons = [
         {tooltip: "Edit Post", ariaLabel: "edit", onClick: handleEditToggle, className: classes.editButton, icon: <EditIcon/>},
         {tooltip: "Delete Post", ariaLabel: "delete", onClick: handleDelete, className: classes.deleteButton, icon: <DeleteOutlineIcon/>},
@@ -178,7 +181,7 @@ export default function PostCard({files, id, editControls, avatar, initials, hea
                 subheader={`Posted on: ${date}`}
             />
             <div className={classes.imageContainer}>
-                {loading ? (
+                {files?.length > 0 && loading ? (
                     <CircularProgress
                         color={"secondary"}
                         size={60}

@@ -10,7 +10,6 @@ const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
         display: 'flex',
-        // height: "700px",
     },
     tabRoot: {
         paddingLeft: theme.spacing(3),
@@ -58,6 +57,13 @@ function a11yProps(index) {
     };
 }
 
+/**
+ * Renders vertical tab selector and tab container
+ *
+ * @param panels
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export default function VerticalTabs({panels}) {
     const classes = useStyles();
     const [value, setValue] = React.useState(0);

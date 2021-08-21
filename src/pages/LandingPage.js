@@ -41,6 +41,7 @@ export default function LandingPage() {
             </Typography>
             <img
                 src={theme.palette.type === "dark" ? logoDark : logoLight}
+                alt={"Vibe Check Logo"}
                 height={200}
                 width={200}
                 className={classes.image}

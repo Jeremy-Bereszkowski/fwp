@@ -13,7 +13,7 @@ import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 
 import DefaultLayout from "../layouts/DefaultLayout";
 
-import {useAuth} from "../components/Provides/AuthProvider";
+import {useAuth} from "../components/Providers/AuthProvider";
 import WarningDialog from "../components/Dialog/WarningDialog";
 import VerticalTabs from "../components/Tabs/TabPanel";
 import AvatarPanel from "../components/TabPanels/AvatarPanel/AvatarPanel";
@@ -28,16 +28,34 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
+/**
+ * Account page
+ *  Private page where users can view their profile details and settings
+ *
+ *  Providers facilities to update user details and user avatar
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export default function AccountPage() {
     const { currentUser, deleteUser } = useAuth()
     const classes = useStyles();
     const { enqueueSnackbar } = useSnackbar();
 
+    /* Account panel data */
+    const accountPanels = [
+        {label: "Avatar", render: <AvatarPanel/>},
+        {label: "Details", render: <AccountDetailsPanel/>},
+    ]
+
+    /* State variables */
     const [dialogOpen, setDialogOpen] = React.useState(false);
 
+    /* State modifiers */
     const handleDialogOpen = () => setDialogOpen(true);
     const handleDialogClose = () => setDialogOpen(false);
 
+    /* Event handlers */
     const onDelete = () => {
         deleteUser(currentUser)
         enqueueSnackbar('Account deleted!', { variant: 'warning' });
@@ -83,18 +101,7 @@ export default function AccountPage() {
                 </Grid>
             </Grid>
             <div className={classes.tabContainer}>
-                <VerticalTabs
-                    panels={[
-                        {
-                            label: "Avatar",
-                            render: <AvatarPanel/>
-                        },
-                        {
-                            label: "Details",
-                            render: <AccountDetailsPanel/>
-                        },
-                    ]}
-                />
+                <VerticalTabs panels={accountPanels}/>
             </div>
             <WarningDialog
                 headerLabel={'Warning!'}

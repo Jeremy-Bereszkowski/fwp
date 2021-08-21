@@ -8,8 +8,8 @@ import {
 
 import DefaultLayout from "../layouts/DefaultLayout";
 
-import {usePost} from "../components/Provides/PostProvider";
-import {useAuth} from "../components/Provides/AuthProvider";
+import {usePost} from "../components/Providers/PostProvider";
+import {useAuth} from "../components/Providers/AuthProvider";
 import NewPostCard from "../components/Cards/NewPostCard";
 import PostCard from "../components/Cards/PostCard";
 import WarningDialog from "../components/Dialog/WarningDialog";
@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
  * Feed page - private page
  *
  *  Renders all posts from all users
- *  Provides facility to create a new post
+ *  Providers facility to create a new post
  *
  * @returns {JSX.Element}
  * @constructor
@@ -50,6 +50,7 @@ export default function FeedPage() {
     const {currentUser, getUserByEmail, getInitialsOfUser} = useAuth();
     const feed = posts ?? []
 
+    /* State variables */
     const [loading, setLoading] = React.useState(false)
     const [inputData, setInputData] = React.useState('')
     const [files, setFiles] = React.useState([])
@@ -57,6 +58,7 @@ export default function FeedPage() {
     const [uploadFileDialogOpen, setUploadFileDialogOpen] = React.useState(false);
     const [activePost, setActivePost] = React.useState(false);
 
+    /* State modifiers */
     const handleLoadingSet = () => setLoading(true)
     const handleLoadingUnset = () => setLoading(false)
 
@@ -74,17 +76,26 @@ export default function FeedPage() {
 
     const handleActivePostSet = (postId) => setActivePost(postId);
 
+    /* Event handlers */
     const onSubmit = () => {
         if (!inputData) return;
 
         handleLoadingSet()
 
-        postCreate(inputData, files)
-            .then(() => {
-                handleInputDataReset();
-                handleFileReset()
-                handleLoadingUnset()
-            });
+        if (files?.length > 0) {
+            postCreate(inputData, files)
+                .then(() => {
+                    handleInputDataReset();
+                    handleFileReset()
+                    handleLoadingUnset()
+                });
+        } else {
+            postCreate(inputData, files)
+            handleInputDataReset();
+            handleFileReset()
+            handleLoadingUnset()
+        }
+
     }
 
     const onEdit = (postId, body) => {
@@ -97,7 +108,7 @@ export default function FeedPage() {
         enqueueSnackbar('Post deleted', { variant: 'warning' });
     }
 
-    const handleDeletePress = (postId) => {
+    const onDeletePress = (postId) => {
         handleWarningDialogOpen()
         handleActivePostSet(postId)
     }
@@ -143,7 +154,7 @@ export default function FeedPage() {
                                 body={ele.body}
                                 files={ele.fileNames}
                                 onEdit={(body) => onEdit(ele.postId, body)}
-                                onDelete={() => handleDeletePress(ele.postId)}
+                                onDelete={() => onDeletePress(ele.postId)}
                             />
                             <PostReplyCard
                                 postId={ele.postId}

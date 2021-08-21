@@ -8,7 +8,7 @@ import {
     MenuItem, Typography
 } from "@material-ui/core";
 
-import {useAuth} from "../Provides/AuthProvider";
+import {useAuth} from "../Providers/AuthProvider";
 import {Link} from "react-router-dom";
 import {Urls} from "../../data/Urls";
 import UserAvatar from "../Avatar/UserAvatar";

@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 
 import {Avatar} from "@material-ui/core";
 
-import {useAuth} from "../Provides/AuthProvider";
+import {useAuth} from "../Providers/AuthProvider";
 
 export default function ProfilePictureAvatar() {
     const {currentUser, getAvatarUrlBlob, getCurrentUserAvatar } = useAuth();

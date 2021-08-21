@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import PropTypes from 'prop-types'
 import {Avatar, makeStyles} from "@material-ui/core";
 
-import {useAuth} from "../Provides/AuthProvider";
+import {useAuth} from "../Providers/AuthProvider";
 import clsx from "clsx";
 
 const useStyles = makeStyles(theme => ({

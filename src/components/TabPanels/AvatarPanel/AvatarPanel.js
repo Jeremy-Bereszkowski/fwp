@@ -8,7 +8,7 @@ import {
 import DefaultPanel from "../DefaultPanel";
 import AvatarPanelTopSection from "./AvatarPanelTopSection";
 import AvatarPanelBottomSection from "./AvatarPanelBottomSection";
-import {avatarMap, useAuth} from "../../Provides/AuthProvider";
+import {avatarMap, useAuth} from "../../Providers/AuthProvider";
 
 const useStyles = makeStyles(theme => ({
     divider: {
@@ -25,17 +25,23 @@ export const avatarColors = [
     {label: "Green", colorCode: "success"},
 ];
 
+/**
+ * Panel for selecting user avatar
+ *  - Upper panel displays avatar colors
+ *  - Lower panel allows users to upload a profile picture
+ *    for an avatar
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export default function AvatarPanel() {
     const classes = useStyles()
     const {getCurrentUserAvatar, setCurrentUserAvatar} = useAuth()
     const userAvatar = getCurrentUserAvatar()
 
-    const onUpdateAvatarColor = (color) => {
-        setCurrentUserAvatar(avatarMap("color", userAvatar.url, color));
-    }
-    const onUpdateAvatarUrl = () => {
-        setCurrentUserAvatar(avatarMap("url", userAvatar.url, ""));
-    }
+    /* Event handlers */
+    const onUpdateAvatarColor = (color) => setCurrentUserAvatar(avatarMap("color", userAvatar.url, color));
+    const onUpdateAvatarUrl = () => setCurrentUserAvatar(avatarMap("url", userAvatar.url, ""));
 
     return (
         <DefaultPanel tabTitle={"Choose your avatar"}>

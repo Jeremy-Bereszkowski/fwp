@@ -136,6 +136,6 @@ CustomButton.propTypes = {
         "primary", "secondary", "default", "inherit", "warning"
     ]),
     progress: PropTypes.shape({
-        loading: PropTypes.bool.isRequired,
+        loading: PropTypes.bool
     })
 }

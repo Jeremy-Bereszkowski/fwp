@@ -12,7 +12,7 @@ import {DropzoneArea} from "material-ui-dropzone";
 
 import AvatarDisplayCard from "../../Cards/AvatarDisplayCard";
 
-import {avatarMap, useAuth} from "../../Provides/AuthProvider";
+import {avatarMap, useAuth} from "../../Providers/AuthProvider";
 import CustomButton from "../../Button/CustomButton";
 
 import {uploadBlob} from "../../../util/firebase/storage";

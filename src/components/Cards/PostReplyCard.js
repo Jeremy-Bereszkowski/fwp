@@ -12,8 +12,8 @@ import {
     Typography,
 } from "@material-ui/core";
 
-import {usePost} from "../Provides/PostProvider";
-import {useAuth} from "../Provides/AuthProvider";
+import {usePost} from "../Providers/PostProvider";
+import {useAuth} from "../Providers/AuthProvider";
 
 
 const useStyles = makeStyles((theme) => ({

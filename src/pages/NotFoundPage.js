@@ -13,6 +13,13 @@ const useStyles = makeStyles(theme => ({
     },
 }))
 
+/**
+ * Not found page
+ *  Public page which users are directed if they reach a broken url
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export default function NotFoundPage() {
     const classes = useStyles();
     return (

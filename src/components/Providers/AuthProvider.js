@@ -2,9 +2,11 @@ import React, {useContext, useEffect, createContext, useState} from "react";
 import {avatarColors} from "../TabPanels/AvatarPanel/AvatarPanel";
 import {downloadBlob} from "../../util/firebase/storage";
 
+/* Local storage keys */
 const USER_LIST_KEY = 'user-list'
 const CURRENT_USER_KEY = 'current-user'
 
+// Create a date string from the current Date Time
 export function dateToString() {
     const date = new Date()
     const dateStringDateMonth = `${date}`.slice(4,10)
@@ -13,6 +15,7 @@ export function dateToString() {
     return `${dateStringDateMonth},${dateStringYear}`
 }
 
+// Function returns a avatar object with optional parameters
 export function avatarMap(selected, url, color) {
     return {
         selected: selected ?? "color",
@@ -21,6 +24,7 @@ export function avatarMap(selected, url, color) {
     }
 }
 
+// Function returns a user object with not-optional parameters
 function userMap(firstName, lastName, email, password) {
     return {
         firstName,
@@ -32,6 +36,7 @@ function userMap(firstName, lastName, email, password) {
     }
 }
 
+// Creates user initials string from name
 const firstLetterUppercase = (string) => string[0].toUpperCase()
 
 const AuthContext = createContext();
@@ -39,42 +44,38 @@ const AuthContext = createContext();
 // Hook that enables any component to subscribe to auth state
 export const useAuth = () => useContext(AuthContext)
 
-// Context Provider component that wraps your app and makes auth object
+// Context Provider component that wraps app and makes auth object
 // available to any child component that calls the useAuth() hook.
 export function AuthProvider({ children }) {
-    const [loading, setLoading] = useState( true)
-    const [currentUser, setCurrentUser] = useState( null)
-    const [currentUserAvatarUrl, setCurrentUserAvatarUrl] = useState( null)
-
+    /* Get current user from session storage and store in state */
     useEffect(() => {
         const currentUser = handleCurrentUserSessionGet()
 
         if (currentUser) handleCurrentUserStateSet(currentUser)
-        getUserAvatarUrlBlob(currentUser)
 
         handleLoadingUnset()
     }, [])
 
+    /* State variables */
+    const [loading, setLoading] = useState( true)
+    const [currentUser, setCurrentUser] = useState( null)
+
+    /* State handlers */
     const handleCurrentUserStateSet = user => setCurrentUser(user)
     const handleCurrentUserStateUnset = () => setCurrentUser(null)
 
-    // const handleLoadingSet = () => setLoading(true)
     const handleLoadingUnset = () => setLoading(false)
 
+    /* Session Storage handlers */
     const handleCurrentUserSessionGet = () => JSON.parse(sessionStorage.getItem(CURRENT_USER_KEY));
     const handleCurrentUserSessionSet = user => sessionStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
     const handleCurrentUserSessionUnset = () => sessionStorage.removeItem(CURRENT_USER_KEY);
 
+    /* Local storage handlers */
     const setUserList = (userList) => localStorage.setItem(USER_LIST_KEY, JSON.stringify(userList));
     const getUserList = () => JSON.parse(localStorage.getItem(USER_LIST_KEY));
 
-    const getUserAvatarUrlBlob = (user) => {
-        if (user?.avatar?.url) {
-            downloadBlob(user.avatar.url)
-                .then(setCurrentUserAvatarUrl)
-        }
-    }
-
+    /* User helper functions */
     const getAvatarUrlBlob = (avatar) => {
         if (avatar?.url) {
             return downloadBlob(avatar.url)
@@ -127,7 +128,6 @@ export function AuthProvider({ children }) {
         setUserList(userList)
         handleCurrentUserSessionSet(matchingUser)
         handleCurrentUserStateSet(matchingUser)
-        getUserAvatarUrlBlob(matchingUser)
     }
 
     const updateUser = (user) => {
@@ -163,7 +163,6 @@ export function AuthProvider({ children }) {
 
     const auth = {
         currentUser,
-        currentUserAvatarUrl,
         signUp,
         signIn,
         signOut,

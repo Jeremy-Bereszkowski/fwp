@@ -3,7 +3,7 @@ import {Redirect, Route} from "react-router-dom";
 
 import {Urls} from "../../data/Urls";
 
-import {useAuth} from "../Provides/AuthProvider";
+import {useAuth} from "../Providers/AuthProvider";
 
 /**
  * Route wrapper for publicly accessible pages

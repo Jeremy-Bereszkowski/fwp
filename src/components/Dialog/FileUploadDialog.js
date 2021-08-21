@@ -46,7 +46,7 @@ export default function FileUploadDialog(props) {
             <DialogActions>
                 <div className={classes.actionContainer}>
                     <Typography color={"error"}>
-                        Max. upload size of 10mb
+                        Max. upload size of 10MB
                     </Typography>
                     <CustomButton
                         color={"primary"}

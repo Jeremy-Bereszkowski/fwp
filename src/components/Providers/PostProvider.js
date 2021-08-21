@@ -3,27 +3,27 @@ import {dateToString, useAuth} from "./AuthProvider";
 import { v4 as uuidv4 } from 'uuid';
 import {uploadBlob} from "../../util/firebase/storage";
 
+/* Local storage keys */
 const POST_LIST_KEY = 'post-list'
 
 const PostContext = createContext(undefined);
 
-// Hook that enables any component to subscribe to auth state
+// Hook that enables any component to subscribe to post state
 export const usePost = () => useContext(PostContext)
 
-// Context Provider component that wraps your app and makes auth object
-// available to any child component that calls the useAuth() hook.
+// Context Provider component that wraps app and makes post object
+// available to any child component that calls the usePost() hook.
 export function PostProvider({ children }) {
     const {currentUser, getUserByEmail} = useAuth()
 
+    /* Ref used to monitor currentUser state changes for user delete purposes */
     const ref = useRef({});
     useEffect(() => {
         ref.current = currentUser;
     });
     const prevCurrentUser = ref.current;
 
-    const [loading, setLoading] = useState( true)
-    const [posts, setPosts] = useState( [])
-
+    /* Load posts from local storage into state */
     useEffect(() => {
         const posts = getPostListLocalStorage() ?? []
 
@@ -31,6 +31,7 @@ export function PostProvider({ children }) {
         handleLoadingUnset()
     }, [])
 
+    /* Monitor currentUser for onDelete action */
     useEffect(() => {
         if (
             !currentUser &&
@@ -40,7 +41,11 @@ export function PostProvider({ children }) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentUser]);
 
+    /* State variables */
+    const [loading, setLoading] = useState( true)
+    const [posts, setPosts] = useState( [])
 
+    /* State handlers */
     const handlePostListSet = posts => setPosts(posts)
 
     const handleLoadingUnset = () => setLoading(false)
@@ -48,6 +53,7 @@ export function PostProvider({ children }) {
     const setPostListLocalStorage = (userList) => localStorage.setItem(POST_LIST_KEY, JSON.stringify(userList));
     const getPostListLocalStorage = () => JSON.parse(localStorage.getItem(POST_LIST_KEY));
 
+    /* Post helper functions */
     const postAddNew = (post) => {
         const postList = getPostListLocalStorage();
         setPostListLocalStorage([...(postList ?? []), post]);
@@ -68,23 +74,31 @@ export function PostProvider({ children }) {
     const postCreate = (body, files) => {
         const id = uuidv4()
 
-        const fileNames = files.map((ele, key) => (
-            `${id}_${key}`
-        ))
-
-        return uploadBlob(fileNames[0], files[0])
-            .then(() => {
-                const newPost = {
+        if (files?.length > 0) {
+            return uploadBlob(id, files[0])
+                .then(() => postAddNew({
                     postId: id,
                     userId: currentUser.email,
                     body,
-                    fileNames,
+                    fileNames: [
+                        id
+                    ],
                     postDate: dateToString(),
                     replies: []
-                };
+                }))
+        } else {
+            const newPost = {
+                postId: id,
+                userId: currentUser.email,
+                body,
+                fileNames: [],
+                postDate: dateToString(),
+                replies: []
+            };
 
-                postAddNew(newPost);
-            })
+            postAddNew(newPost);
+        }
+
     }
 
     const replyCreate = (body, postId) => {

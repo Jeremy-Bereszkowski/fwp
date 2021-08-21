@@ -9,8 +9,8 @@ import {
     ThemeProvider,
 } from "@material-ui/core";
 
-import {AuthProvider} from "./components/Provides/AuthProvider";
-import {PostProvider} from "./components/Provides/PostProvider";
+import {AuthProvider} from "./components/Providers/AuthProvider";
+import {PostProvider} from "./components/Providers/PostProvider";
 import MainRouter from "./components/Router/MainRouter";
 
 /**

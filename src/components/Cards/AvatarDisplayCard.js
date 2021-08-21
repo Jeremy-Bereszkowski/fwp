@@ -10,7 +10,7 @@ import {
 
 import ColorAvatar from "../Avatar/ColorAvatar";
 import ProfilePictureAvatar from "../Avatar/ProfilePictureAvatar";
-import {useAuth} from "../Provides/AuthProvider";
+import {useAuth} from "../Providers/AuthProvider";
 
 const useStyles = makeStyles(theme => ({
     avatarCard: {

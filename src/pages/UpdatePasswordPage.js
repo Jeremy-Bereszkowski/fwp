@@ -10,7 +10,7 @@ import {
 
 import DefaultLayout from "../layouts/DefaultLayout";
 
-import {useAuth} from "../components/Provides/AuthProvider";
+import {useAuth} from "../components/Providers/AuthProvider";
 import OutlinedInputWithLabel from "../components/Inputs/OutlinedInputWithLabel";
 import FormButtonGroup from "../components/ButtonGroup/FormButtonGroup";
 
@@ -29,12 +29,27 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
+/**
+ * Update password page
+ *  Private page where signed in users can update their password
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export default function UpdatePasswordPage() {
     const { currentUser, updateUserPassword } = useAuth()
     const history = useHistory()
     const classes = useStyles();
     const { enqueueSnackbar } = useSnackbar();
 
+    /* Form field data */
+    const fields = [
+        {id: 'old_password', type: 'password', label: "Old Password", labelWidth: 100, required: true},
+        {id: 'new_password', type: 'password', label: "New Password", labelWidth: 110, required: true},
+        {id: 'new_password_confirm', type: 'password', label: "New Password Confirm", labelWidth: 170, required: true},
+    ]
+
+    /* State variables */
     const [inputs, setInputs] = React.useState({
         old_password: '',
         new_password: '',
@@ -42,11 +57,13 @@ export default function UpdatePasswordPage() {
     });
     const [errorMessages, setErrorMessages] = React.useState([]);
 
+    /* State handlers */
     const handleErrorMessagesSet = (errors) => setErrorMessages(errors);
     const handleErrorMessagesReset = () => setErrorMessages([]);
 
     const inputDataSet = (event, field) => setInputs({ ...inputs, [field]: event.target.value})
 
+    /* Event handlers */
     const onCancel = () => history.push(Urls.ACCOUNT)
     const onSubmit = (event) => {
         event.preventDefault()
@@ -73,12 +90,6 @@ export default function UpdatePasswordPage() {
         enqueueSnackbar('Password updated', { variant: 'success' });
         history.push(Urls.ACCOUNT)
     }
-
-    const fields = [
-        {id: 'old_password', type: 'password', label: "Old Password", labelWidth: 100, required: true},
-        {id: 'new_password', type: 'password', label: "New Password", labelWidth: 110, required: true},
-        {id: 'new_password_confirm', type: 'password', label: "New Password Confirm", labelWidth: 170, required: true},
-    ]
 
     return (
         <DefaultLayout>

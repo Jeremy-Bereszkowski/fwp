@@ -8,7 +8,7 @@ import {
     makeStyles,
 } from "@material-ui/core";
 
-import {useAuth} from "../Provides/AuthProvider";
+import {useAuth} from "../Providers/AuthProvider";
 import UserAvatar from "../Avatar/UserAvatar";
 import PostCardActions from "./PostCardActions";
 import OutlinedInputWithLabelWithErrors from "../Inputs/OutlinedInputWithLabelWithErrors";
@@ -44,11 +44,14 @@ export default function NewPostCard({loading, files, onSubmit, handleFileUploadD
     const classes = useStyles();
     const {currentUser} = useAuth();
 
+    /* State variables */
     const [errors, setErrors] = React.useState([])
 
+    /* State handlers */
     const handleErrorsSet = (errors) => setErrors(errors);
     const handleErrorsReset = () => setErrors([]);
 
+    /* Event handlers */
     const handleSubmit = (event) => {
         event.preventDefault()
         handleErrorsReset()

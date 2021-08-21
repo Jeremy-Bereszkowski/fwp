@@ -9,7 +9,7 @@ import {
 } from "@material-ui/core";
 
 import AuthForm from "../Form/AuthForm";
-import {useAuth} from "../Provides/AuthProvider";
+import {useAuth} from "../Providers/AuthProvider";
 import {SIGN_UP_TYPE} from "../../layouts/DefaultLayout";
 import {Urls} from "../../data/Urls";
 import {useSnackbar} from "notistack";

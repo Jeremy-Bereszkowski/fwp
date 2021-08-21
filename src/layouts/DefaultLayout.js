@@ -29,7 +29,7 @@ function dialogMap(type, open) {
 /**
  * Renders global AppHeader, AppFooter and AuthDialog
  *
- * Provides <main> wrapper around children
+ * Providers <main> wrapper around children
  *
  * @param children
  * @returns {JSX.Element}

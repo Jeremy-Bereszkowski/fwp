@@ -15,7 +15,7 @@ import AuthButtonGroup from "../ButtonGroup/AuthButtonGroup";
 import AuthNavMenu from "../Menu/AuthNavMenu";
 
 import {Urls} from "../../data/Urls";
-import {useAuth} from "../Provides/AuthProvider";
+import {useAuth} from "../Providers/AuthProvider";
 import CustomButton from "../Button/CustomButton";
 
 const image = "/vibe-check-logo.png"
