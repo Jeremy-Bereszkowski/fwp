@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-import {Grid, makeStyles} from "@material-ui/core";
+import {Grid, makeStyles, useMediaQuery, useTheme} from "@material-ui/core";
 
 import CustomButton from "../Button/CustomButton";
 
@@ -22,6 +22,10 @@ const useStyles = makeStyles((theme) => ({
 export default function FormButtonGroup(props) {
     const { loading, rootClass, leftButton, rightButton } = props
     const classes = useStyles();
+    const theme = useTheme();
+
+    const isSmDown = useMediaQuery(theme.breakpoints.down("sm"));
+    const buttons = !isSmDown ? [leftButton, rightButton] : [rightButton, leftButton]
 
     return (
         <Grid
@@ -31,7 +35,7 @@ export default function FormButtonGroup(props) {
             alignItems={"center"}
             className={rootClass ?? classes.root}
         >
-            {[leftButton, rightButton].map(ele => (
+            {buttons.map(ele => (
                 <Grid item md={5} sm={12} xs={12} key={ele.label}>
                     <div className={ele?.class}>
                         <CustomButton

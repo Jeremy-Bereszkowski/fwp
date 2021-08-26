@@ -1,22 +1,39 @@
-import React, {useContext, useEffect, createContext, useState} from "react";
+import React, {
+    useContext,
+    useEffect,
+    createContext,
+} from "react";
+import {v4 as uuidv4} from "uuid";
+
 import {avatarColors} from "../TabPanels/AvatarPanel/AvatarPanel";
 import {downloadBlob} from "../../util/firebase/storage";
 
 /* Local storage keys */
-const USER_LIST_KEY = 'user-list'
+const USERS_KEY = 'users'
 const CURRENT_USER_KEY = 'current-user'
+
+/* Session Storage current user getter & setter */
+const getCurrentUserSessionStorage = () => JSON.parse(sessionStorage.getItem(CURRENT_USER_KEY));
+const setCurrentUserSessionStorage = (user) => sessionStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+
+/* Local storage users getter & setter */
+const getUsersLocalStorage = () => JSON.parse(localStorage.getItem(USERS_KEY));
+const setUsersLocalStorage = (users) => localStorage.setItem(USERS_KEY, JSON.stringify(users));
 
 // Create a date string from the current Date Time
 export function dateToString() {
     const date = new Date()
     const dateStringDateMonth = `${date}`.slice(4,10)
-    const dateStringYear = `${date}`.slice(10,16)
+    const dateStringYear = `${date}`.slice(10,15)
 
     return `${dateStringDateMonth},${dateStringYear}`
 }
 
+// Creates user initials string from name
+const firstLetterUppercase = (string) => string.charAt(0).toUpperCase()
+
 // Function returns a avatar object with optional parameters
-export function avatarMap(selected, url, color) {
+export function avatarObject(selected, url, color) {
     return {
         selected: selected ?? "color",
         url: url ?? "",
@@ -25,140 +42,130 @@ export function avatarMap(selected, url, color) {
 }
 
 // Function returns a user object with not-optional parameters
-function userMap(firstName, lastName, email, password) {
+function userObject(firstName, lastName, email, password) {
     return {
+        id: uuidv4(),
         firstName,
         lastName,
         email,
         password,
         joinDate: dateToString(),
-        avatar: avatarMap(),
+        avatar: avatarObject(),
     }
 }
 
-// Creates user initials string from name
-const firstLetterUppercase = (string) => string[0].toUpperCase()
+/* Dispatch action type keys */
+const DISPATCH_CURRENT_USER_SET = 'set';
+const DISPATCH_CURRENT_USER_UNSET = 'unset';
+
+/* current user state init */
+const currentUserInit = (user) => {
+    return user
+}
+
+/* current user reducer */
+const currentUserReducer = (posts, action) => {
+    switch(action.type) {
+        case DISPATCH_CURRENT_USER_SET: return action.payload;
+        case DISPATCH_CURRENT_USER_UNSET: return null;
+        default: throw new Error()
+    }
+}
 
 const AuthContext = createContext();
-
 // Hook that enables any component to subscribe to auth state
 export const useAuth = () => useContext(AuthContext)
 
 // Context Provider component that wraps app and makes auth object
 // available to any child component that calls the useAuth() hook.
 export function AuthProvider({ children }) {
-    /* Get current user from session storage and store in state */
+
+    /* current user state and dispatcher */
+    const [currentUser, currentUserDispatch] = React.useReducer(currentUserReducer, getCurrentUserSessionStorage(), currentUserInit);
+
+    /* Dispatchers */
+    const dispatchCurrentUserSet = (user) => currentUserDispatch({type: DISPATCH_CURRENT_USER_SET, payload: user});
+    const dispatchCurrentUserUnset = () => currentUserDispatch({type: DISPATCH_CURRENT_USER_UNSET});
+
+    /* If current user changes update session storage */
+    /* If not in users list -> update local storage */
+    /* If current user is updated -> update local storage */
     useEffect(() => {
-        const currentUser = handleCurrentUserSessionGet()
+        setCurrentUserSessionStorage(currentUser)
+        if (!currentUser) return
 
-        if (currentUser) handleCurrentUserStateSet(currentUser)
-
-        handleLoadingUnset()
-    }, [])
-
-    /* State variables */
-    const [loading, setLoading] = useState( true)
-    const [currentUser, setCurrentUser] = useState( null)
-
-    /* State handlers */
-    const handleCurrentUserStateSet = user => setCurrentUser(user)
-    const handleCurrentUserStateUnset = () => setCurrentUser(null)
-
-    const handleLoadingUnset = () => setLoading(false)
-
-    /* Session Storage handlers */
-    const handleCurrentUserSessionGet = () => JSON.parse(sessionStorage.getItem(CURRENT_USER_KEY));
-    const handleCurrentUserSessionSet = user => sessionStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
-    const handleCurrentUserSessionUnset = () => sessionStorage.removeItem(CURRENT_USER_KEY);
-
-    /* Local storage handlers */
-    const setUserList = (userList) => localStorage.setItem(USER_LIST_KEY, JSON.stringify(userList));
-    const getUserList = () => JSON.parse(localStorage.getItem(USER_LIST_KEY));
-
-    /* User helper functions */
-    const getAvatarUrlBlob = (avatar) => {
-        if (avatar?.url) {
-            return downloadBlob(avatar.url)
+        const users = getUsersLocalStorage() ?? []
+        const match = users?.find(ele => ele?.id === currentUser?.id)
+        if (!match) {
+            /* Add new user to local storage */
+            users.push(currentUser)
+            setUsersLocalStorage(users)
+        } else if (
+            match.firstName !== currentUser.firstName ||
+            match.lastName !== currentUser.lastName ||
+            match.password !== currentUser.password ||
+            match.avatar.url !== currentUser.avatar.url ||
+            match.avatar.selected !== currentUser.avatar.selected ||
+            match.avatar.color.label !== currentUser.avatar.color.label
+        ) {
+            /* Update user in local storage */
+            setUsersLocalStorage([
+                ...users.filter(ele => ele?.id !== currentUser?.id),
+                currentUser
+            ])
         }
-    }
+    }, [currentUser])
 
-    const addNewUser = (user) => {
-        const userList = getUserList();
-        setUserList([...(userList ?? []), user]);
-    }
-
+    /* Auth provider public function */
     const signUp = (firstName, lastName, email, password) => {
-        const user = userMap(firstName, lastName, email, password)
-
-        addNewUser(user)
-        handleCurrentUserSessionSet(user)
-        handleCurrentUserStateSet(user)
+        dispatchCurrentUserSet(userObject(
+            firstName,
+            lastName,
+            email,
+            password
+        ))
     }
 
     const signIn = (email, password) => {
-        const userList = getUserList();
-        const matchingUser = userList?.find(ele => ele.email === email);
+        const users = getUsersLocalStorage();
+        const matchingUser = users.find(ele => ele.email === email);
 
         if (!matchingUser) return false;
         if (matchingUser?.password !== password) return false;
 
-        handleCurrentUserSessionSet(matchingUser)
-        handleCurrentUserStateSet(matchingUser)
-        return true;
+        dispatchCurrentUserSet(matchingUser)
+        return true
     }
 
     const signOut = () => {
-        handleCurrentUserSessionUnset();
-        handleCurrentUserStateUnset();
+        dispatchCurrentUserUnset();
     }
 
-    const getUserByEmail = (email) => getUserList().find(ele => ele.email === email)
-
-    const getCurrentUserInitials = () => `${firstLetterUppercase(currentUser.firstName)}${firstLetterUppercase(currentUser.lastName)}`
-    const getInitialsOfUser = (user) => `${firstLetterUppercase(user.firstName)}${firstLetterUppercase(user.lastName)}`
-
-    const getCurrentUserAvatar = () => currentUser?.avatar
-    const setCurrentUserAvatar = (avatar) => {
-        const userList = getUserList();
-        const matchingUser = userList.find(ele => ele.email === currentUser.email);
-        const indexOfMatchingUser = userList.indexOf(matchingUser);
-
-        userList[indexOfMatchingUser].avatar = avatar
-
-        setUserList(userList)
-        handleCurrentUserSessionSet(matchingUser)
-        handleCurrentUserStateSet(matchingUser)
+    /* User public functions */
+    const getUserById = (id) => getUsersLocalStorage()?.find((ele) => ele.id === id);
+    const getUserByEmail = (email) => getUsersLocalStorage()?.find(ele => ele.email === email);
+    const getUserFullName = (user) => `${user?.firstName} ${user?.lastName}`;
+    const getUserInitials = (user) => `${firstLetterUppercase(user.firstName)}${firstLetterUppercase(user.lastName)}`;
+    const getUserAvatarUrlBlob = (avatar) => {
+        if (avatar.url) {
+            return downloadBlob(avatar.url);
+        }
     }
 
-    const updateUser = (user) => {
-        const userList = getUserList();
-        const matchingUser = userList.find(ele => ele.email === user.email);
-        const indexOfMatchingUser = userList.indexOf(matchingUser);
+    const getCurrentUserInitials = () => getUserInitials(currentUser);
+    const getCurrentUserFullName = () => getUserFullName(currentUser);
+    const getCurrentUserAvatarUrlBlob = () => getUserAvatarUrlBlob(currentUser.avatar);
 
-        userList[indexOfMatchingUser] = user
+    const updateCurrentUser = (user) => dispatchCurrentUserSet(user);
+    const updateCurrentUserAvatar = (avatar) => updateCurrentUser({...currentUser, avatar});
+    const updateCurrentUserNames = (firstName, lastName) => updateCurrentUser({...currentUser, firstName, lastName});
+    const updateCurrentUserPassword = (password) => updateCurrentUser({...currentUser, password});
 
-        setUserList(userList)
-        handleCurrentUserSessionSet(user)
-        handleCurrentUserStateSet(user)
-    }
+    const deleteCurrentUser = () => {
+        const updatedUsers = getUsersLocalStorage()?.filter(ele => ele.id !== currentUser.id);
 
-    const deleteUser = (user) => {
-        const updatedUserList = getUserList()?.filter(ele => ele.email !== user.email);
-
-        setUserList(updatedUserList)
-        handleCurrentUserSessionUnset();
-        handleCurrentUserStateUnset();
-    }
-
-    const updateUserPassword = (password) => {
-        const updatedUser = currentUser
-        updatedUser.password = password
-        updateUser(updatedUser)
-    }
-
-    const doesEmailExist = (email) => {
-        const matchingUser = getUserList()?.find(ele => ele.email === email)
-        return !!matchingUser;
+        setUsersLocalStorage(updatedUsers);
+        updateCurrentUser(null);
     }
 
     const auth = {
@@ -166,17 +173,20 @@ export function AuthProvider({ children }) {
         signUp,
         signIn,
         signOut,
+        getUserById,
         getUserByEmail,
-        getInitialsOfUser,
+        getUserAvatarUrlBlob,
+        getUserFullName,
+        getUserInitials,
+        getCurrentUserAvatarUrlBlob,
+        getCurrentUserFullName,
         getCurrentUserInitials,
-        updateUser,
-        updateUserPassword,
-        deleteUser,
-        doesEmailExist,
-        getCurrentUserAvatar,
-        setCurrentUserAvatar,
-        getAvatarUrlBlob,
+        updateCurrentUser,
+        updateCurrentUserAvatar,
+        updateCurrentUserNames,
+        updateCurrentUserPassword,
+        deleteCurrentUser,
     }
 
-    return <AuthContext.Provider value={auth}>{!loading && children}</AuthContext.Provider>;
+    return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
 }

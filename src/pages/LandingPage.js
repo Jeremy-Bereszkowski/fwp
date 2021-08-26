@@ -1,7 +1,10 @@
 import React from 'react';
-import {makeStyles, Typography, useTheme} from "@material-ui/core";
 
-import DefaultLayout from "../layouts/DefaultLayout";
+import {
+    makeStyles,
+    Typography,
+    useTheme
+} from "@material-ui/core";
 
 const logoLight = "/vibe-check-light.png"
 const logoDark = "/vibe-check-dark.png"
@@ -24,7 +27,7 @@ export default function LandingPage() {
     const classes = useStyles()
     const theme = useTheme()
     return (
-        <DefaultLayout>
+        <>
             <Typography
                 variant={"h2"}
                 component={"h2"}
@@ -53,6 +56,6 @@ export default function LandingPage() {
             >
                 Please sign in or create an account to begin connecting with your peers.
             </Typography>
-        </DefaultLayout>
+        </>
     );
 }

@@ -16,6 +16,7 @@ import AccountPage from "../../pages/AccountPage";
 import UpdatePasswordPage from "../../pages/UpdatePasswordPage";
 
 import {Urls as URLS} from "../../data/Urls";
+import DefaultLayout from "../../layouts/DefaultLayout";
 
 /**
  * App React Router
@@ -33,40 +34,42 @@ import {Urls as URLS} from "../../data/Urls";
 export default function MainRouter() {
     return (
         <Router>
-            <Switch>
-                {/* Page Routes */}
-                <PublicRoute
-                    exact
-                    path={URLS.ROOT}
-                    component={LandingPage}
-                />
-                <PrivateRoute
-                    exact
-                    path={URLS.FEED}
-                    component={FeedPage}
-                />
-                <PrivateRoute
-                    exact
-                    path={URLS.ACCOUNT}
-                    component={AccountPage}
-                />
-                <PrivateRoute
-                    exact
-                    path={URLS.UPDATE_PASSWORD}
-                    component={UpdatePasswordPage}
-                />
-                <PublicRoute
-                    exact
-                    path={URLS.PAGE_NOT_FOUND}
-                    component={NotFoundPage}
-                />
+            <DefaultLayout>
+                <Switch>
+                    {/* Page Routes */}
+                    <PublicRoute
+                        exact
+                        path={URLS.ROOT}
+                        component={LandingPage}
+                    />
+                    <PrivateRoute
+                        exact
+                        path={URLS.FEED}
+                        component={FeedPage}
+                    />
+                    <PrivateRoute
+                        exact
+                        path={URLS.ACCOUNT}
+                        component={AccountPage}
+                    />
+                    <PrivateRoute
+                        exact
+                        path={URLS.UPDATE_PASSWORD}
+                        component={UpdatePasswordPage}
+                    />
+                    <PublicRoute
+                        exact
+                        path={URLS.PAGE_NOT_FOUND}
+                        component={NotFoundPage}
+                    />
 
 
-                {/* Default Route */}
-                <Route>
-                    <Redirect to={URLS.PAGE_NOT_FOUND}/>
-                </Route>
-            </Switch>
+                    {/* Default Route */}
+                    <Route>
+                        <Redirect to={URLS.PAGE_NOT_FOUND}/>
+                    </Route>
+                </Switch>
+            </DefaultLayout>
         </Router>
     );
 }

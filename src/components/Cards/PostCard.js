@@ -63,7 +63,7 @@ const useStyles = makeStyles((theme) => ({
     },
     form: {
         backgroundColor: theme.palette.type === "dark" ? theme.palette.grey["700"] : theme.palette.grey["50"],
-        borderRadius: theme.shape.borderRadius,
+        borderRadius: `0 0 ${theme.shape.borderRadius} ${theme.shape.borderRadius}`,
     }
 }));
 

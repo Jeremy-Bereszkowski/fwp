@@ -5,7 +5,10 @@ import {Container, makeStyles} from "@material-ui/core";
 import AppHeader from "../components/AppBar/AppHeader";
 import AppFooter from "../components/Footer/AppFooter";
 import AuthDialog from "../components/Dialog/AuthDialog";
+import AppDrawer from "../components/AppDrawer/AppDrawer";
+import {useAuth} from "../components/Providers/AuthProvider";
 
+/* Auth modal type keys */
 export const SIGN_IN_TYPE = "SIGN_IN";
 export const SIGN_UP_TYPE = "SIGN_UP";
 
@@ -19,7 +22,8 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-function dialogMap(type, open) {
+/* Auth modal type object */
+function authDialog(type, open) {
     return {
         type: type ?? SIGN_UP_TYPE,
         open: open ?? false,
@@ -29,7 +33,8 @@ function dialogMap(type, open) {
 /**
  * Renders global AppHeader, AppFooter and AuthDialog
  *
- * Providers <main> wrapper around children
+ * - Providers <main> wrapper around children
+ * - AuthDialog only rendered when no user is logged in
  *
  * @param children
  * @returns {JSX.Element}
@@ -37,15 +42,33 @@ function dialogMap(type, open) {
  */
 export default function DefaultLayout({children}) {
     const classes = useStyles();
+    const { currentUser } = useAuth()
 
-    const [dialog, setDialog] = React.useState(dialogMap());
+    /* State variables*/
+    const [drawerOpen, setDrawerOpen] = React.useState(false)
+    const [dialog, setDialog] = React.useState(authDialog());
 
-    const handleDialogOpen = (type) => setDialog(dialogMap(type, true));
+    /* State handlers */
+    const handleDrawerOpen = (open) => setDrawerOpen(open);
+    const handleDrawerClose = () => setDrawerOpen( false);
+
+    const handleDialogOpen = (type) => setDialog(authDialog(type, true));
     const handleDialogClose = () => setDialog({...dialog, open: false});
 
     return (
         <>
-            <AppHeader handleDialogOpen={handleDialogOpen}/>
+            <AppHeader
+                open={drawerOpen}
+                handleDialogOpen={handleDialogOpen}
+                handleMenuOpen={handleDrawerOpen}
+                handleMenuClose={handleDrawerClose}
+            />
+            {currentUser && (
+                <AppDrawer
+                    open={drawerOpen}
+                    handleClose={handleDrawerClose}
+                />
+            )}
             <main className={classes.main}>
                 <Container maxWidth={"md"} className={classes.mainContainer}>
                     {children}

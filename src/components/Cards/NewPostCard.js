@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
  */
 export default function NewPostCard({loading, files, onSubmit, handleFileUploadDialogOpen, value, handleInputDataUpdate, handleInputDataReset}) {
     const classes = useStyles();
-    const {currentUser} = useAuth();
+    const {getCurrentUserFullName} = useAuth();
 
     /* State variables */
     const [errors, setErrors] = React.useState([])
@@ -65,7 +65,7 @@ export default function NewPostCard({loading, files, onSubmit, handleFileUploadD
         <Card elevation={6} className={classes.root}>
             <CardHeader
                 avatar={<UserAvatar/>}
-                title={`${currentUser.firstName} ${currentUser.lastName}`}
+                title={getCurrentUserFullName()}
                 className={classes.cardHeader}
             />
             <form onSubmit={handleSubmit}>

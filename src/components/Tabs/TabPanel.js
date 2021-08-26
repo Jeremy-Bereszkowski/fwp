@@ -5,15 +5,20 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
+import {useMediaQuery, useTheme} from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        flexGrow: 1,
-        display: 'flex',
+        [theme.breakpoints.up("md")]: {
+            flexGrow: 1,
+            display: 'flex',
+        },
     },
     tabRoot: {
-        paddingLeft: theme.spacing(3),
         width: "100%",
+        [theme.breakpoints.up("md")]: {
+            paddingLeft: theme.spacing(3),
+        }
     },
     tab: {
         borderRadius: theme.shape.borderRadius,
@@ -21,9 +26,15 @@ const useStyles = makeStyles((theme) => ({
     tabs: {
         border: `1px solid ${theme.palette.divider}`,
         borderRadius: theme.shape.borderRadius,
-        width: theme.spacing(22),
-        maxWidth: theme.spacing(22),
-        minWidth: theme.spacing(22),
+        [theme.breakpoints.down("sm")]: {
+            width: "100%",
+            marginBottom: theme.spacing(2),
+        },
+        [theme.breakpoints.up("md")]: {
+            width: theme.spacing(22),
+            maxWidth: theme.spacing(22),
+            minWidth: theme.spacing(22),
+        },
     },
 }));
 
@@ -66,16 +77,17 @@ function a11yProps(index) {
  */
 export default function VerticalTabs({panels}) {
     const classes = useStyles();
+    const theme = useTheme();
+    const isMdUp = useMediaQuery(theme.breakpoints.up("md"))
+
     const [value, setValue] = React.useState(0);
 
-    const handleChange = (event, newValue) => {
-        setValue(newValue);
-    };
+    const handleChange = (event, newValue) => setValue(newValue);
 
     return (
         <div className={classes.root}>
             <Tabs
-                orientation="vertical"
+                orientation={isMdUp ? "vertical" : "horizontal"}
                 variant="scrollable"
                 value={value}
                 onChange={handleChange}

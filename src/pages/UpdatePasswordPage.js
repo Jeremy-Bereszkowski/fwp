@@ -8,14 +8,12 @@ import {
     Typography,
 } from "@material-ui/core";
 
-import DefaultLayout from "../layouts/DefaultLayout";
-
+import {passwordChecks} from "../components/Dialog/AuthDialog";
 import {useAuth} from "../components/Providers/AuthProvider";
 import OutlinedInputWithLabel from "../components/Inputs/OutlinedInputWithLabel";
 import FormButtonGroup from "../components/ButtonGroup/FormButtonGroup";
 
 import {Urls} from "../data/Urls";
-import {passwordChecks} from "../components/Dialog/AuthDialog";
 
 const useStyles = makeStyles((theme) => ({
     buttonGroup: {
@@ -37,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
  * @constructor
  */
 export default function UpdatePasswordPage() {
-    const { currentUser, updateUserPassword } = useAuth()
+    const { currentUser, updateCurrentUserPassword } = useAuth()
     const history = useHistory()
     const classes = useStyles();
     const { enqueueSnackbar } = useSnackbar();
@@ -86,13 +84,13 @@ export default function UpdatePasswordPage() {
 
         if (errors.length > 0) return handleErrorMessagesSet(errors)
 
-        updateUserPassword(inputs.new_password);
+        updateCurrentUserPassword(inputs.new_password);
         enqueueSnackbar('Password updated', { variant: 'success' });
         history.push(Urls.ACCOUNT)
     }
 
     return (
-        <DefaultLayout>
+        <>
             <Typography
                 variant={"h6"}
                 component={"h3"}
@@ -153,6 +151,6 @@ export default function UpdatePasswordPage() {
                 />
             </form>
 
-        </DefaultLayout>
+        </>
     );
 }

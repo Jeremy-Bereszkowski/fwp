@@ -50,7 +50,7 @@ export default function FileUploadDialog(props) {
                     </Typography>
                     <CustomButton
                         color={"primary"}
-                        variant={"outlined"}
+                        variant={"contained"}
                         onClick={onClose}
                     >
                         DONE

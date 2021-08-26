@@ -11,8 +11,6 @@ import {
 
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 
-import DefaultLayout from "../layouts/DefaultLayout";
-
 import {useAuth} from "../components/Providers/AuthProvider";
 import WarningDialog from "../components/Dialog/WarningDialog";
 import VerticalTabs from "../components/Tabs/TabPanel";
@@ -38,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
  * @constructor
  */
 export default function AccountPage() {
-    const { currentUser, deleteUser } = useAuth()
+    const { currentUser, deleteCurrentUser } = useAuth()
     const classes = useStyles();
     const { enqueueSnackbar } = useSnackbar();
 
@@ -57,11 +55,11 @@ export default function AccountPage() {
 
     /* Event handlers */
     const onDelete = () => {
-        deleteUser(currentUser)
+        deleteCurrentUser()
         enqueueSnackbar('Account deleted!', { variant: 'warning' });
     }
     return (
-        <DefaultLayout>
+        <>
             <Grid
                 container
                 alignItems={"center"}
@@ -113,6 +111,6 @@ export default function AccountPage() {
                     Are you sure you want to delete your account? This is irreversible.
                 </Typography>
             </WarningDialog>
-        </DefaultLayout>
+        </>
     );
 }

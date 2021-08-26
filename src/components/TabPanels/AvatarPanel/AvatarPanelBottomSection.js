@@ -12,7 +12,7 @@ import {DropzoneArea} from "material-ui-dropzone";
 
 import AvatarDisplayCard from "../../Cards/AvatarDisplayCard";
 
-import {avatarMap, useAuth} from "../../Providers/AuthProvider";
+import {avatarObject, useAuth} from "../../Providers/AuthProvider";
 import CustomButton from "../../Button/CustomButton";
 
 import {uploadBlob} from "../../../util/firebase/storage";
@@ -29,12 +29,23 @@ const useStyles = makeStyles(theme => ({
         "&:hover": {
             border: `1px solid ${theme.palette.type === "dark" ? "white" : "grey"}`
         }
+    },
+    buttonContainer: {
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        [theme.breakpoints.down("sm")]: {
+            alignItems: "center",
+        },
+        [theme.breakpoints.up('md')]: {
+            alignItems: "flex-end",
+        }
     }
 }));
 
 export default function AvatarPanelBottomSection({onClick}) {
     const classes = useStyles();
-    const {setCurrentUserAvatar} = useAuth()
+    const { updateCurrentUserAvatar } = useAuth()
     const { enqueueSnackbar } = useSnackbar();
 
     const [files, setFiles] = React.useState([])
@@ -48,10 +59,9 @@ export default function AvatarPanelBottomSection({onClick}) {
         if (files.length === 0) return
 
         const id = uuidv4()
-
         uploadBlob(id, files[0])
             .then(() => {
-                setCurrentUserAvatar(avatarMap("url", id, ""));
+                updateCurrentUserAvatar(avatarObject("url", id, ""));
                 handleFilesReset()
                 setKey(key => ++key)
                 enqueueSnackbar('Profile picture uploaded', { variant: 'success' });
@@ -59,69 +69,50 @@ export default function AvatarPanelBottomSection({onClick}) {
     }
 
     return (
-        <Grid
-            container
-            alignItems={"stretch"}
-            alignContent={"stretch"}
-            justifyContent={"space-between"}
-        >
-            <Grid item md={2} style={{display: "flex", alignItems: "center"}}>
-                <Typography
-                    variant={"h4"}
-                    component={"p"}
-                    color={"textSecondary"}
-                    align={"center"}
-                >
-                    Image:
-                </Typography>
-            </Grid>
-            <Grid item md={7}>
-                <div className={classes.cardContainer}>
-                    <DropzoneArea
-                        key={debounceKey}
-                        onChange={handleFilesSet}
-                        filesLimit={1}
-                        acceptedFiles={['image/jpeg', 'image/png']}
-                        showAlerts={false}
-                        previewGridClasses={{
-                            container: classes.chipContainer,
-                        }}
-                        dropzoneClass={classes.dropZone}
-                    />
-                </div>
-            </Grid>
-            <Grid item md={2}>
-                <Grid
-                    container
-                    direction={"column"}
-                    justifyContent={"space-between"}
-                    alignContent={"stretch"}
-                    alignItems={"flex-end"}
-                    style={{height: "100%"}}
-                >
-                    <Grid item>
-                        <div className={classes.cardContainer}>
-                            <AvatarDisplayCard
-                                onClick={onClick}
-                                color={""}
-                                label={"Image"}
-                            />
-                        </div>
-                    </Grid>
-                    <Grid item>
-                        <div className={classes.cardContainer}>
-                            <CustomButton
-                                variant={"contained"}
-                                color={"primary"}
-                                onClick={onUploadProfilePic}
-                            >
-                                Upload
-                            </CustomButton>
-                        </div>
-                    </Grid>
+        <>
+            <Typography
+                variant={"h4"}
+                component={"p"}
+                color={"textSecondary"}
+            >
+                Image:
+            </Typography>
+            <Grid container justifyContent={"space-evenly"}>
+                <Grid item md={7} sm={8} xs={8}>
+                    <div className={classes.cardContainer}>
+                        <DropzoneArea
+                            key={debounceKey}
+                            onChange={handleFilesSet}
+                            filesLimit={1}
+                            acceptedFiles={['image/jpeg', 'image/png']}
+                            showAlerts={false}
+                            previewGridClasses={{
+                                container: classes.chipContainer,
+                            }}
+                            dropzoneClass={classes.dropZone}
+                        />
+                    </div>
+                </Grid>
+                <Grid item md={2} sm={2} xs={2} className={classes.buttonContainer}>
+                    <div className={classes.cardContainer}>
+                        <AvatarDisplayCard
+                            onClick={onClick}
+                            color={""}
+                            label={"Image"}
+                        />
+                    </div>
+                    <div className={classes.cardContainer}>
+                        <CustomButton
+                            variant={"contained"}
+                            color={"primary"}
+                            onClick={onUploadProfilePic}
+                        >
+                            Upload
+                        </CustomButton>
+                    </div>
                 </Grid>
             </Grid>
-        </Grid>
+        </>
     );
 }
 

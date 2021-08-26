@@ -5,8 +5,6 @@ import {
     Typography
 } from "@material-ui/core";
 
-import DefaultLayout from "../layouts/DefaultLayout";
-
 const useStyles = makeStyles(theme => ({
     root: {
         marginTop: theme.spacing(20),
@@ -23,7 +21,7 @@ const useStyles = makeStyles(theme => ({
 export default function NotFoundPage() {
     const classes = useStyles();
     return (
-        <DefaultLayout>
+        <>
             <Typography
                 variant={"h3"}
                 component={"h2"}
@@ -32,7 +30,7 @@ export default function NotFoundPage() {
             >
                 404 - Page not found :(
             </Typography>
-        </DefaultLayout>
+        </>
 
     );
 }

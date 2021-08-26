@@ -6,8 +6,6 @@ import {
     Typography,
 } from "@material-ui/core";
 
-import DefaultLayout from "../layouts/DefaultLayout";
-
 import {usePost} from "../components/Providers/PostProvider";
 import {useAuth} from "../components/Providers/AuthProvider";
 import NewPostCard from "../components/Cards/NewPostCard";
@@ -47,8 +45,7 @@ export default function FeedPage() {
     const classes = useStyles();
     const {enqueueSnackbar} = useSnackbar()
     const {posts, postCreate, postUpdate, postDelete} = usePost();
-    const {currentUser, getUserByEmail, getInitialsOfUser} = useAuth();
-    const feed = posts ?? []
+    const {currentUser, getUserById, getCurrentUserInitials, getUserFullName} = useAuth();
 
     /* State variables */
     const [loading, setLoading] = React.useState(false)
@@ -114,7 +111,7 @@ export default function FeedPage() {
     }
 
     return (
-        <DefaultLayout>
+        <>
             <div className={classes.root}>
                 <div className={classes.newPostContainer}>
                     <NewPostCard
@@ -127,7 +124,7 @@ export default function FeedPage() {
                         handleFileUploadDialogOpen={handleFileUploadDialogOpen}
                     />
                 </div>
-                {feed?.length === 0 && (
+                {posts.length === 0 && (
                     <div className={classes.cardContainer}>
                         <Typography
                             align={"center"}
@@ -139,25 +136,25 @@ export default function FeedPage() {
                         </Typography>
                     </div>
                 )}
-                {[...feed].reverse().map(ele => {
-                    const user = getUserByEmail(ele.userId)
+                {[...posts].reverse().map(ele => {
+                    const user = getUserById(ele.userId)
                     const avatar = user?.avatar
                     return (
-                        <div className={classes.cardContainer} key={ele.postId}>
+                        <div className={classes.cardContainer} key={ele.id}>
                             <PostCard
-                                id={ele.postId}
+                                id={ele.id}
                                 avatar={avatar}
-                                initials={getInitialsOfUser(user)}
-                                editControls={currentUser.email === ele.userId}
-                                header={`${user.firstName} ${user.lastName}`}
+                                initials={getCurrentUserInitials(user)}
+                                editControls={currentUser.id === ele.userId}
+                                header={getUserFullName(user)}
                                 date={ele.postDate}
                                 body={ele.body}
                                 files={ele.fileNames}
-                                onEdit={(body) => onEdit(ele.postId, body)}
-                                onDelete={() => onDeletePress(ele.postId)}
+                                onEdit={(body) => onEdit(ele.id, body)}
+                                onDelete={() => onDeletePress(ele.id)}
                             />
                             <PostReplyCard
-                                postId={ele.postId}
+                                postId={ele.id}
                                 postOwnerName={`${user.firstName} ${user.lastName}`}
                                 replies={ele.replies}
                             />
@@ -182,6 +179,6 @@ export default function FeedPage() {
                     Are you sure you want to delete your post? This is irreversible.
                 </Typography>
             </WarningDialog>
-        </DefaultLayout>
+        </>
     );
 }

@@ -27,7 +27,7 @@ function reducer(userData, action) {
 }
 
 export default function AccountDetailsPanel() {
-    const { currentUser, updateUser } = useAuth()
+    const { currentUser, updateCurrentUserNames } = useAuth()
     const history = useHistory()
     const { enqueueSnackbar } = useSnackbar();
 
@@ -50,12 +50,10 @@ export default function AccountDetailsPanel() {
     const onReset = () => dispatchInputDataReset()
     const onSubmit = (event) => {
         event.preventDefault()
-        updateUser(userData);
+        updateCurrentUserNames(userData.firstName, userData.lastName)
         enqueueSnackbar('Details updated successfully!', { variant: 'success' });
     }
-    const onChangePassword = () => {
-        history.push(Urls.UPDATE_PASSWORD)
-    }
+    const onChangePassword = () => history.push(Urls.UPDATE_PASSWORD)
 
     return (
         <DefaultPanel tabTitle={"Update your personal details"}>

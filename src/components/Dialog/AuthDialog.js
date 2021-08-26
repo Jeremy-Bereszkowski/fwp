@@ -1,4 +1,5 @@
 import React from 'react';
+import {useSnackbar} from "notistack";
 import { useHistory } from "react-router-dom";
 import PropTypes from 'prop-types';
 
@@ -12,7 +13,6 @@ import AuthForm from "../Form/AuthForm";
 import {useAuth} from "../Providers/AuthProvider";
 import {SIGN_UP_TYPE} from "../../layouts/DefaultLayout";
 import {Urls} from "../../data/Urls";
-import {useSnackbar} from "notistack";
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -64,7 +64,7 @@ export default function AuthDialog({open, handleClose, headerLabel, type}) {
     const classes = useStyles();
     const auth = useAuth()
     const history = useHistory()
-    const {doesEmailExist} = useAuth()
+    const {getUserByEmail} = useAuth()
     const { enqueueSnackbar } = useSnackbar();
 
     const [userInputData, dispatchUserInputData] = React.useReducer(inputDataReducer, inputDataMap());
@@ -91,9 +91,9 @@ export default function AuthDialog({open, handleClose, headerLabel, type}) {
 
         const {email, password, passwordConfirm} = userInputData
 
+        /* Perform sign-up validations */
         if (type === SIGN_UP_TYPE) {
-            if (doesEmailExist(email.trim())) {
-                console.log("- Email already exists");
+            if (getUserByEmail(email.trim())) {
                 return handleErrorMessagesSet(["- Email already exists"])
             }
 
@@ -107,9 +107,8 @@ export default function AuthDialog({open, handleClose, headerLabel, type}) {
             }
 
             if (errors.length > 0) return handleErrorMessagesSet(errors)
+            else handleSignUp()
         }
-
-        if (type === SIGN_UP_TYPE) handleSignUp()
         else handleSignIn()
     }
 

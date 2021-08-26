@@ -1,13 +1,65 @@
-import React, {useRef, useContext, createContext, useState, useEffect} from "react";
+import React, {useRef, useContext, createContext, useEffect} from "react";
 import {dateToString, useAuth} from "./AuthProvider";
 import { v4 as uuidv4 } from 'uuid';
+
 import {uploadBlob} from "../../util/firebase/storage";
 
 /* Local storage keys */
 const POST_LIST_KEY = 'post-list'
 
-const PostContext = createContext(undefined);
+/* Local storage posts getter/setter */
+const getPostsLocalStorage = () => JSON.parse(localStorage.getItem(POST_LIST_KEY));
+const setPostsLocalStorage = (posts) => localStorage.setItem(POST_LIST_KEY, JSON.stringify(posts));
 
+/* Dispatch action type keys */
+const DISPATCH_POST_ADD = 'add'
+const DISPATCH_POST_EDIT = 'edit'
+const DISPATCH_POST_DELETE = 'delete'
+const DISPATCH_POST_DELETE_ALL_FROM_USER = 'delete-from-user'
+const DISPATCH_REPLY_ADD = 'reply-add'
+
+/* post state init */
+const postInit = (posts) => posts ?? []
+
+/* post reducer */
+const postReducer = (posts, action) => {
+    switch(action.type) {
+        case DISPATCH_POST_ADD: return [...posts, action.payload]
+        case DISPATCH_POST_EDIT: return [...posts.filter(ele => ele.id !== action.payload.id), action.payload]
+        case DISPATCH_POST_DELETE: return posts.filter(ele => ele.id !== action.payload)
+        case DISPATCH_POST_DELETE_ALL_FROM_USER: return posts.filter(ele => ele.userId !== action.payload)
+        case DISPATCH_REPLY_ADD: {
+            const post = posts.find(ele => ele.id === action.payload.id)
+            post.replies.push(action.payload.reply)
+            return [...posts.filter(ele => ele.id !== action.payload.id), post]
+        }
+        default: throw new Error()
+    }
+}
+
+/* Data objects */
+const postObject = (userId, body, files) => {
+    const id = uuidv4()
+    return {
+        id: id,
+        userId: userId,
+        body: body,
+        fileNames: files ? [id] : [],
+        postDate: dateToString(),
+        replies: []
+    }
+}
+
+const replyObject = (currentUserEmail, body) => {
+    return {
+        replyId: uuidv4(),
+        userId: currentUserEmail,
+        body,
+        postDate: dateToString(),
+    }
+}
+
+const PostContext = createContext(undefined);
 // Hook that enables any component to subscribe to post state
 export const usePost = () => useContext(PostContext)
 
@@ -23,133 +75,67 @@ export function PostProvider({ children }) {
     });
     const prevCurrentUser = ref.current;
 
-    /* Load posts from local storage into state */
-    useEffect(() => {
-        const posts = getPostListLocalStorage() ?? []
+    /* Posts state and dispatcher */
+    const [posts, dispatchPosts] = React.useReducer(postReducer, getPostsLocalStorage(), postInit);
 
-        handlePostListSet(posts)
-        handleLoadingUnset()
-    }, [])
+    /* Dispatchers */
+    const dispatchPostsAdd = (post) => dispatchPosts({type: DISPATCH_POST_ADD, payload: post})
+    const dispatchPostsEdit = (post) => dispatchPosts({type: DISPATCH_POST_EDIT, payload: post})
+    const dispatchPostsDelete = (id) => dispatchPosts({type: DISPATCH_POST_DELETE, payload: id})
+    const dispatchPostsDeleteAllFromUser = (userId) => dispatchPosts({type: DISPATCH_POST_DELETE_ALL_FROM_USER, payload: userId})
+    const dispatchReplyAdd = (postId, reply) => dispatchPosts({type: DISPATCH_REPLY_ADD, payload: {id: postId, reply}})
 
     /* Monitor currentUser for onDelete action */
     useEffect(() => {
-        if (
-            !currentUser &&
-            prevCurrentUser?.email &&
-            !getUserByEmail(prevCurrentUser?.email)
-        ) deleteAllPostsByUser(prevCurrentUser?.email)
+        if (!currentUser
+            && prevCurrentUser?.email
+            && !getUserByEmail(prevCurrentUser?.email)
+        ) dispatchPostsDeleteAllFromUser(prevCurrentUser.email)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentUser]);
 
-    /* State variables */
-    const [loading, setLoading] = useState( true)
-    const [posts, setPosts] = useState( [])
+    /* If posts state changes update local storage */
+    useEffect(() => {
+        setPostsLocalStorage(posts)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [posts]);
 
-    /* State handlers */
-    const handlePostListSet = posts => setPosts(posts)
-
-    const handleLoadingUnset = () => setLoading(false)
-
-    const setPostListLocalStorage = (userList) => localStorage.setItem(POST_LIST_KEY, JSON.stringify(userList));
-    const getPostListLocalStorage = () => JSON.parse(localStorage.getItem(POST_LIST_KEY));
-
-    /* Post helper functions */
-    const postAddNew = (post) => {
-        const postList = getPostListLocalStorage();
-        setPostListLocalStorage([...(postList ?? []), post]);
-        handlePostListSet([...(postList ?? []), post]);
-    }
-
-    const addReplyToPost = (reply, postId) => {
-        const postList = getPostListLocalStorage();
-        const matchingPost = postList.find(ele => ele.postId === postId)
-        const indexOfMatchingPost = postList.indexOf(matchingPost)
-
-        postList[indexOfMatchingPost].replies = [...postList[indexOfMatchingPost].replies, reply]
-
-        handlePostListSet(postList)
-        setPostListLocalStorage(postList)
-    }
-
+    /* Post provider public functions */
     const postCreate = (body, files) => {
-        const id = uuidv4()
+        if (!(body && files))  return
 
-        if (files?.length > 0) {
-            return uploadBlob(id, files[0])
-                .then(() => postAddNew({
-                    postId: id,
-                    userId: currentUser.email,
-                    body,
-                    fileNames: [
-                        id
-                    ],
-                    postDate: dateToString(),
-                    replies: []
-                }))
-        } else {
-            const newPost = {
-                postId: id,
-                userId: currentUser.email,
-                body,
-                fileNames: [],
-                postDate: dateToString(),
-                replies: []
-            };
-
-            postAddNew(newPost);
-        }
-
-    }
-
-    const replyCreate = (body, postId) => {
-        const reply = {
-            replyId: uuidv4(),
-            userId: currentUser.email,
-            body,
-            postDate: dateToString(),
-        }
-
-        addReplyToPost(reply, postId)
+        const post = postObject(currentUser.id, body, files?.length > 0)
+        if (files?.length > 0)
+            return uploadBlob(post.id, files[0])
+                .then(() => dispatchPostsAdd(post))
+        else
+            dispatchPostsAdd(post);
     }
 
     const postUpdate = (postId, body) => {
-        const postList = getPostListLocalStorage();
-        const matchingPost = postList.find(ele => ele.postId === postId)
-        const indexOfMatchingPost = postList.indexOf(matchingPost)
+        if (!(postId && body))  return
 
-        postList[indexOfMatchingPost].body = body
+        const matchingPost = posts.find(ele => ele.id === postId)
+        matchingPost.body = body
 
-        handlePostListSet(postList)
-        setPostListLocalStorage(postList)
+        dispatchPostsEdit(matchingPost)
     }
 
     const postDelete = (id) => {
-        const postList = getPostListLocalStorage();
-        const updatedList = postList?.filter(ele => ele.postId !== id)
-
-        setPostListLocalStorage(updatedList);
-        handlePostListSet(updatedList);
+        if (id) dispatchPostsDelete(id)
     }
 
-    const deleteAllPostsByUser = (userEmail) => {
-        const postList = getPostListLocalStorage();
-        const updatedList = postList?.filter(ele => ele.userId !== userEmail);
-
-        const list = updatedList ?? []
-
-        setPostListLocalStorage(list);
-        handlePostListSet(list);
+    const replyCreate = (body, postId) => {
+        if (postId && body) dispatchReplyAdd(postId, replyObject(currentUser.email, body))
     }
 
     const post = {
         posts,
-        getPostListLocalStorage,
         postCreate,
         postUpdate,
         postDelete,
-        deleteAllPostsByUser,
         replyCreate,
     }
 
-    return <PostContext.Provider value={post}>{!loading && children}</PostContext.Provider>;
+    return <PostContext.Provider value={post}>{children}</PostContext.Provider>;
 }

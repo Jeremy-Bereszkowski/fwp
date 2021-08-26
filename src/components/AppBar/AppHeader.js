@@ -8,7 +8,10 @@ import {
     Toolbar,
     Typography,
     makeStyles,
-    Link, Avatar,
+    Link,
+    Avatar,
+    useMediaQuery,
+    useTheme, ClickAwayListener,
 } from "@material-ui/core";
 
 import AuthButtonGroup from "../ButtonGroup/AuthButtonGroup";
@@ -51,19 +54,17 @@ const useStyles = makeStyles(theme => ({
  * @returns {JSX.Element}
  * @constructor
  */
-export default function AppHeader({handleDialogOpen}) {
+export default function AppHeader({open, handleDialogOpen, handleMenuOpen, handleMenuClose}) {
     const classes = useStyles();
-    const auth = useAuth()
+    const {currentUser} = useAuth()
     const history = useHistory();
+    const theme = useTheme();
+    const isXsDown = !useMediaQuery(theme.breakpoints.down("xs"));
 
-    const [menuOpen, setMenuOpen] = React.useState(null)
+    const handleSetMenuOpen = (event) => handleMenuOpen(event.currentTarget);
+    const handleSetMenuClose = () => handleMenuClose(null);
 
-    const handleSetMenuOpen = (event) => setMenuOpen(event.currentTarget);
-    const handleSetMenuClose = () => setMenuOpen(null);
-
-    React.useEffect(() => {
-        handleSetMenuClose()
-    }, [auth.currentUser])
+    const handleSetMenuToggle = (event) => open ? handleSetMenuClose() : handleSetMenuOpen(event);
 
     return (
         <AppBar>
@@ -97,7 +98,7 @@ export default function AppHeader({handleDialogOpen}) {
                             alignItems={"center"}
                             justifyContent={"space-between"}
                         >
-                            {auth.currentUser && (
+                            {currentUser && isXsDown && (
                                 <Grid item component={"li"} className={classes.feedButtonContainer}>
                                     <CustomButton
                                         whiteText
@@ -110,15 +111,19 @@ export default function AppHeader({handleDialogOpen}) {
                                 </Grid>
                             )}
                             <Grid item>
-                                {!auth.currentUser ? (
-                                    <AuthButtonGroup handleDialogOpen={handleDialogOpen}/>
-                                ) : (
-                                    <AuthNavMenu
-                                        menuOpen={menuOpen}
-                                        handleSetMenuOpen={handleSetMenuOpen}
-                                        handleSetMenuClose={handleSetMenuClose}
-                                    />
-                                )}
+                                <ClickAwayListener onClickAway={handleSetMenuClose}>
+                                    <div>
+                                        {!currentUser ? (
+                                            <AuthButtonGroup handleDialogOpen={handleDialogOpen}/>
+                                        ) : (
+                                            <AuthNavMenu
+                                                open={open}
+                                                handleOpenToggle={handleSetMenuToggle}
+                                                handleOpenClose={handleSetMenuClose}
+                                            />
+                                        )}
+                                    </div>
+                                </ClickAwayListener>
                             </Grid>
                         </Grid>
                     </Grid>
@@ -129,5 +134,10 @@ export default function AppHeader({handleDialogOpen}) {
 }
 
 AppHeader.propTypes = {
+    handleMenuOpen: PropTypes.func.isRequired,
+    handleMenuClose: PropTypes.func.isRequired,
     handleDialogOpen: PropTypes.func.isRequired,
+    open: PropTypes.oneOfType([
+        PropTypes.bool, PropTypes.object,
+    ]).isRequired,
 };

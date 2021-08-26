@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function PostReplyCard({postId, postOwnerName, replies}) {
     const classes = useStyles()
-    const post = usePost()
+    const {replyCreate} = usePost()
     const {getUserByEmail} = useAuth();
 
     const [reply, setReply] = React.useState('')
@@ -60,7 +60,7 @@ export default function PostReplyCard({postId, postOwnerName, replies}) {
 
         if (!reply) return
 
-        post.replyCreate(reply, postId)
+        replyCreate(reply, postId)
         handleReplyReset()
     }
 

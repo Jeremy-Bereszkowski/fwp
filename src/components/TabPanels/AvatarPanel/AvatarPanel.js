@@ -8,7 +8,7 @@ import {
 import DefaultPanel from "../DefaultPanel";
 import AvatarPanelTopSection from "./AvatarPanelTopSection";
 import AvatarPanelBottomSection from "./AvatarPanelBottomSection";
-import {avatarMap, useAuth} from "../../Providers/AuthProvider";
+import {avatarObject, useAuth} from "../../Providers/AuthProvider";
 
 const useStyles = makeStyles(theme => ({
     divider: {
@@ -36,12 +36,12 @@ export const avatarColors = [
  */
 export default function AvatarPanel() {
     const classes = useStyles()
-    const {getCurrentUserAvatar, setCurrentUserAvatar} = useAuth()
-    const userAvatar = getCurrentUserAvatar()
+    const {currentUser, updateCurrentUserAvatar} = useAuth()
+    const userAvatarUrl = currentUser.avatar.url
 
     /* Event handlers */
-    const onUpdateAvatarColor = (color) => setCurrentUserAvatar(avatarMap("color", userAvatar.url, color));
-    const onUpdateAvatarUrl = () => setCurrentUserAvatar(avatarMap("url", userAvatar.url, ""));
+    const onUpdateAvatarColor = (color) => updateCurrentUserAvatar(avatarObject("color", userAvatarUrl, color));
+    const onUpdateAvatarUrl = () => updateCurrentUserAvatar(avatarObject("url", userAvatarUrl, ""));
 
     return (
         <DefaultPanel tabTitle={"Choose your avatar"}>

@@ -27,11 +27,38 @@ const useStyles = makeStyles(theme => ({
     success: {
         backgroundColor: theme.palette.type === 'dark' ? theme.palette.success.main : theme.palette.success.light,
     },
-    hoverEffect: {
+    primaryHover: {
+        border: `1px solid ${theme.palette.type === 'dark' ? theme.palette.primary.light : theme.palette.primary.main}`,
+        "&:hover": {
+            border: `1px solid ${theme.palette.type === 'dark' ? theme.palette.primary.light : theme.palette.primary.light}`,
+            backgroundColor: theme.palette.type === 'dark' ? theme.palette.primary.dark : theme.palette.primary.main,
+        }
+    },
+    secondaryHover: {
         "&:hover": {
             backgroundColor: theme.palette.type === 'dark' ? theme.palette.secondary.dark : theme.palette.secondary.main,
         }
-    }
+    },
+    infoHover: {
+        "&:hover": {
+            backgroundColor: theme.palette.type === 'dark' ? theme.palette.info.dark : theme.palette.info.main,
+        }
+    },
+    warningHover: {
+        "&:hover": {
+            backgroundColor: theme.palette.type === 'dark' ? theme.palette.warning.dark : theme.palette.warning.main,
+        }
+    },
+    errorHover: {
+        "&:hover": {
+            backgroundColor: theme.palette.type === 'dark' ? theme.palette.error.dark : theme.palette.error.main,
+        }
+    },
+    successHover: {
+        "&:hover": {
+            backgroundColor: theme.palette.type === 'dark' ? theme.palette.success.dark : theme.palette.success.main,
+        }
+    },
 }));
 
 export default function ColorAvatar({color, initials, onHoverEffect}) {
@@ -41,14 +68,12 @@ export default function ColorAvatar({color, initials, onHoverEffect}) {
     const avatarClasses = clsx({
         [classes.avatar]: true,
         [classes[color]]: color,
-        [classes.hoverEffect]: onHoverEffect,
-    })
-
-    const avatarString = initials ? initials : getCurrentUserInitials()
+        [classes[`${color}Hover`]]: onHoverEffect,
+    });
 
     return (
         <Avatar className={avatarClasses}>
-            {avatarString}
+            {initials ?? getCurrentUserInitials()}
         </Avatar>
     );
 }
@@ -59,9 +84,9 @@ ColorAvatar.defaultProps = {
 };
 
 ColorAvatar.propTypes = {
-    initals: PropTypes.string,
+    initials: PropTypes.string,
     onHoverEffect: PropTypes.bool,
     color: PropTypes.oneOf([
         "primary", "secondary", "warning", "error", "info", "success"
-    ])
+    ]).isRequired
 };
