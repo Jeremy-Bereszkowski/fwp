@@ -48,7 +48,7 @@ const useStyles = makeStyles((theme) => ({
 export default function PostReplyCard({postId, postOwnerName, replies}) {
     const classes = useStyles()
     const {replyCreate} = usePost()
-    const {getUserByEmail} = useAuth();
+    const {getUserById} = useAuth();
 
     const [reply, setReply] = React.useState('')
 
@@ -93,7 +93,7 @@ export default function PostReplyCard({postId, postOwnerName, replies}) {
                 </Button>
             </form>
             {replies.length > 0 && replies.map((ele, key) => {
-                const user = getUserByEmail(ele.userId)
+                const user = getUserById(ele.userId)
                 return (
                     <React.Fragment key={ele.replyId}>
                         <CardContent className={classes.replyCard}>

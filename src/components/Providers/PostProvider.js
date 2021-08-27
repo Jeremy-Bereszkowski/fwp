@@ -50,10 +50,10 @@ const postObject = (userId, body, files) => {
     }
 }
 
-const replyObject = (currentUserEmail, body) => {
+const replyObject = (userId, body) => {
     return {
         replyId: uuidv4(),
-        userId: currentUserEmail,
+        userId,
         body,
         postDate: dateToString(),
     }
@@ -126,7 +126,7 @@ export function PostProvider({ children }) {
     }
 
     const replyCreate = (body, postId) => {
-        if (postId && body) dispatchReplyAdd(postId, replyObject(currentUser.email, body))
+        if (postId && body) dispatchReplyAdd(postId, replyObject(currentUser.id, body))
     }
 
     const post = {

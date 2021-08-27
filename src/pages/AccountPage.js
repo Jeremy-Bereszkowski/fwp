@@ -40,6 +40,12 @@ export default function AccountPage() {
     const classes = useStyles();
     const { enqueueSnackbar } = useSnackbar();
 
+    /* Reset page to window top on route */
+    React.useEffect(() => {
+        window.scrollTo(0, 0);
+        document.body.scrollTop = 0;
+    });
+
     /* Account panel data */
     const accountPanels = [
         {label: "Avatar", render: <AvatarPanel/>},

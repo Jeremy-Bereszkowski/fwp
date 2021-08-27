@@ -26,6 +26,13 @@ const useStyles = makeStyles(theme => ({
 export default function LandingPage() {
     const classes = useStyles()
     const theme = useTheme()
+
+    /* Reset page to window top on route */
+    React.useEffect(() => {
+        window.scrollTo(0, 0);
+        document.body.scrollTop = 0;
+    });
+
     return (
         <>
             <Typography

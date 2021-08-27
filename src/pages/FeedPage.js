@@ -47,6 +47,12 @@ export default function FeedPage() {
     const {posts, postCreate, postUpdate, postDelete} = usePost();
     const {currentUser, getUserById, getCurrentUserInitials, getUserFullName} = useAuth();
 
+    /* Reset page to window top on route */
+    React.useEffect(() => {
+        window.scrollTo(0, 0);
+        document.body.scrollTop = 0;
+    });
+
     /* State variables */
     const [loading, setLoading] = React.useState(false)
     const [inputData, setInputData] = React.useState('')

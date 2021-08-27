@@ -40,6 +40,12 @@ export default function UpdatePasswordPage() {
     const classes = useStyles();
     const { enqueueSnackbar } = useSnackbar();
 
+    /* Reset page to window top on route */
+    React.useEffect(() => {
+        window.scrollTo(0, 0);
+        document.body.scrollTop = 0;
+    });
+
     /* Form field data */
     const fields = [
         {id: 'old_password', type: 'password', label: "Old Password", labelWidth: 100, required: true},
