@@ -23,9 +23,11 @@ const useStyles = makeStyles(theme => ({
         justifyContent: "center",
         flexDirection: "column",
         cursor: "pointer",
-        transition: "all .15s ease-in-out",
-        "&:hover": {
-            transform: "scale(1.1)",
+        "@media (hover: hover)": {
+            transition: "all .15s ease-in-out",
+            "&:hover": {
+                transform: "scale(1.1)",
+            }
         }
     },
     primaryType: {

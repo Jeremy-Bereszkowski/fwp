@@ -35,9 +35,6 @@ const useStyles = makeStyles(theme => ({
                 transform: "scale(1.02)",
             },
         }
-        /*"&:hover": {
-            border: `1px solid ${theme.palette.type === "dark" ? "white" : "grey"}`
-        }*/
     },
     buttonContainer: {
         display: "flex",
