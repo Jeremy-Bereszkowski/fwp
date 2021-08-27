@@ -21,29 +21,34 @@ import {useSnackbar} from "notistack";
 const useStyles = makeStyles(theme => ({
     cardContainer: {
         margin: theme.spacing(2, 0),
-        marginBottom: "auto",
     },
     button: {
-        margin: theme.spacing(2, 0),
+        marginBottom: theme.spacing(1),
     },
     chipContainer: {
         marginTop: theme.spacing(2)
     },
     dropZone: {
-        "&:hover": {
-            border: `1px solid ${theme.palette.type === "dark" ? "white" : "grey"}`
+        "@media (hover: hover)": {
+            transition: "all .15s ease-in-out",
+            "&:hover": {
+                transform: "scale(1.02)",
+            },
         }
+        /*"&:hover": {
+            border: `1px solid ${theme.palette.type === "dark" ? "white" : "grey"}`
+        }*/
     },
     buttonContainer: {
-        height: "100%",
         display: "flex",
         flexDirection: "column",
-        // [theme.breakpoints.down("sm")]: {
-        //     alignItems: "center",
-        // },
-        // [theme.breakpoints.up('md')]: {
+        justifyContent: "space-between",
+        [theme.breakpoints.down("sm")]: {
             alignItems: "flex-end",
-        // }
+        },
+        [theme.breakpoints.up('md')]: {
+            alignItems: "center",
+        }
     }
 }));
 
