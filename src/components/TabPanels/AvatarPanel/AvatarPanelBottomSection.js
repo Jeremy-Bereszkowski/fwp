@@ -20,7 +20,11 @@ import {useSnackbar} from "notistack";
 
 const useStyles = makeStyles(theme => ({
     cardContainer: {
-        margin: theme.spacing(2, 0)
+        margin: theme.spacing(2, 0),
+        marginBottom: "auto",
+    },
+    button: {
+        margin: theme.spacing(2, 0),
     },
     chipContainer: {
         marginTop: theme.spacing(2)
@@ -34,12 +38,12 @@ const useStyles = makeStyles(theme => ({
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        [theme.breakpoints.down("sm")]: {
-            alignItems: "center",
-        },
-        [theme.breakpoints.up('md')]: {
+        // [theme.breakpoints.down("sm")]: {
+        //     alignItems: "center",
+        // },
+        // [theme.breakpoints.up('md')]: {
             alignItems: "flex-end",
-        }
+        // }
     }
 }));
 
@@ -77,8 +81,11 @@ export default function AvatarPanelBottomSection({onClick}) {
             >
                 Image:
             </Typography>
-            <Grid container justifyContent={"space-evenly"}>
-                <Grid item md={7} sm={8} xs={8}>
+            <Grid
+                container
+                justifyContent={"space-between"}
+            >
+                <Grid item md={8} sm={8} xs={8}>
                     <div className={classes.cardContainer}>
                         <DropzoneArea
                             key={debounceKey}
@@ -93,7 +100,7 @@ export default function AvatarPanelBottomSection({onClick}) {
                         />
                     </div>
                 </Grid>
-                <Grid item md={2} sm={2} xs={2} className={classes.buttonContainer}>
+                <Grid item md={3} sm={3} xs={3} className={classes.buttonContainer}>
                     <div className={classes.cardContainer}>
                         <AvatarDisplayCard
                             onClick={onClick}
@@ -101,7 +108,7 @@ export default function AvatarPanelBottomSection({onClick}) {
                             label={"Image"}
                         />
                     </div>
-                    <div className={classes.cardContainer}>
+                    <div className={classes.button}>
                         <CustomButton
                             variant={"contained"}
                             color={"primary"}
