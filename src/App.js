@@ -48,7 +48,11 @@ export default function App() {
         <AuthProvider>
             <PostProvider>
                 <ThemeProvider theme={theme}>
-                    <SnackbarProvider maxSnack={3} anchorOrigin={{vertical: "top", horizontal: "center"}}>
+                    <SnackbarProvider
+                        maxSnack={3}
+                        autoHideDuration={2000}
+                        anchorOrigin={{vertical: "top", horizontal: "center"}}
+                    >
                         <CssBaseline/>
                         <MainRouter/>
                     </SnackbarProvider>
