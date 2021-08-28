@@ -27,7 +27,7 @@ function reducer(userData, action) {
 }
 
 export default function AccountDetailsPanel() {
-    const { currentUser, updateCurrentUserNames } = useAuth()
+    const { currentUser, updateCurrentUserFirstName, updateCurrentUserLastName } = useAuth()
     const history = useHistory()
     const { enqueueSnackbar } = useSnackbar();
 
@@ -50,7 +50,8 @@ export default function AccountDetailsPanel() {
     const onReset = () => dispatchInputDataReset()
     const onSubmit = (event) => {
         event.preventDefault()
-        updateCurrentUserNames(userData.firstName, userData.lastName)
+        updateCurrentUserFirstName(userData.firstName)
+        updateCurrentUserLastName(userData.lastName)
         enqueueSnackbar('Details updated successfully!', { variant: 'success' });
     }
     const onChangePassword = () => history.push(Urls.UPDATE_PASSWORD)

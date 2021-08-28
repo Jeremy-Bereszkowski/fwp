@@ -30,7 +30,7 @@ export function dateToString() {
 }
 
 // Creates user initials string from name
-const firstLetterUppercase = (string) => string.charAt(0).toUpperCase()
+const firstLetterUppercase = (string) => string?.charAt(0)?.toUpperCase()
 
 // Function returns a avatar object with optional parameters
 export function avatarObject(selected, url, color) {
@@ -57,6 +57,10 @@ function userObject(firstName, lastName, email, password) {
 /* Dispatch action type keys */
 const DISPATCH_CURRENT_USER_SET = 'set';
 const DISPATCH_CURRENT_USER_UNSET = 'unset';
+const DISPATCH_CURRENT_USER_UPDATE_FIRST_NAME = 'update-first-name';
+const DISPATCH_CURRENT_USER_UPDATE_LAST_NAME = 'update-last-name';
+const DISPATCH_CURRENT_USER_UPDATE_PASSWORD = 'update-password';
+const DISPATCH_CURRENT_USER_UPDATE_AVATAR = 'update-avatar';
 
 /* current user state init */
 const currentUserInit = (user) => {
@@ -64,10 +68,14 @@ const currentUserInit = (user) => {
 }
 
 /* current user reducer */
-const currentUserReducer = (posts, action) => {
+const currentUserReducer = (user, action) => {
     switch(action.type) {
         case DISPATCH_CURRENT_USER_SET: return action.payload;
         case DISPATCH_CURRENT_USER_UNSET: return null;
+        case DISPATCH_CURRENT_USER_UPDATE_FIRST_NAME: return {...user, firstName: action.payload};
+        case DISPATCH_CURRENT_USER_UPDATE_LAST_NAME: return {...user, lastName: action.payload};
+        case DISPATCH_CURRENT_USER_UPDATE_PASSWORD: return {...user, password: action.payload};
+        case DISPATCH_CURRENT_USER_UPDATE_AVATAR: return {...user, avatar: action.payload};
         default: throw new Error()
     }
 }
@@ -86,6 +94,10 @@ export function AuthProvider({ children }) {
     /* Dispatchers */
     const dispatchCurrentUserSet = (user) => currentUserDispatch({type: DISPATCH_CURRENT_USER_SET, payload: user});
     const dispatchCurrentUserUnset = () => currentUserDispatch({type: DISPATCH_CURRENT_USER_UNSET});
+    const dispatchCurrentUserUpdateFirstName = (firstName) => currentUserDispatch({type: DISPATCH_CURRENT_USER_UPDATE_FIRST_NAME, payload: firstName});
+    const dispatchCurrentUserUpdateLastName = (lastName) => currentUserDispatch({type: DISPATCH_CURRENT_USER_UPDATE_LAST_NAME, payload: lastName});
+    const dispatchCurrentUserUpdatePassword = (password) => currentUserDispatch({type: DISPATCH_CURRENT_USER_UPDATE_PASSWORD, payload: password});
+    const dispatchCurrentUserUpdateAvatar = (avatar) => currentUserDispatch({type: DISPATCH_CURRENT_USER_UPDATE_AVATAR, payload: avatar});
 
     /* If current user changes update session storage */
     /* If not in users list -> update local storage */
@@ -157,9 +169,10 @@ export function AuthProvider({ children }) {
     const getCurrentUserAvatarUrlBlob = () => getUserAvatarUrlBlob(currentUser.avatar);
 
     const updateCurrentUser = (user) => dispatchCurrentUserSet(user);
-    const updateCurrentUserAvatar = (avatar) => updateCurrentUser({...currentUser, avatar});
-    const updateCurrentUserNames = (firstName, lastName) => updateCurrentUser({...currentUser, firstName, lastName});
-    const updateCurrentUserPassword = (password) => updateCurrentUser({...currentUser, password});
+    const updateCurrentUserAvatar = (avatar) => dispatchCurrentUserUpdateAvatar(avatar);
+    const updateCurrentUserFirstName = (firstName) => dispatchCurrentUserUpdateFirstName(firstName);
+    const updateCurrentUserLastName = (lastName) => dispatchCurrentUserUpdateLastName(lastName);
+    const updateCurrentUserPassword = (password) => dispatchCurrentUserUpdatePassword(password);
 
     const deleteCurrentUser = () => {
         const updatedUsers = getUsersLocalStorage()?.filter(ele => ele.id !== currentUser.id);
@@ -183,7 +196,8 @@ export function AuthProvider({ children }) {
         getCurrentUserInitials,
         updateCurrentUser,
         updateCurrentUserAvatar,
-        updateCurrentUserNames,
+        updateCurrentUserFirstName,
+        updateCurrentUserLastName,
         updateCurrentUserPassword,
         deleteCurrentUser,
     }
