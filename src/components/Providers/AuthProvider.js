@@ -178,7 +178,7 @@ export function AuthProvider({ children }) {
         const updatedUsers = getUsersLocalStorage()?.filter(ele => ele.id !== currentUser.id);
 
         setUsersLocalStorage(updatedUsers);
-        updateCurrentUser(null);
+        dispatchCurrentUserUnset();
     }
 
     const auth = {

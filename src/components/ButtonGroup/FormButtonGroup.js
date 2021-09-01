@@ -36,7 +36,7 @@ export default function FormButtonGroup(props) {
             className={rootClass ?? classes.root}
         >
             {buttons.map(ele => (
-                <Grid item md={5} sm={12} xs={12} key={ele.label}>
+                <Grid item md={5} sm={5} xs={12} key={ele.label}>
                     <div className={ele?.class}>
                         <CustomButton
                             fullWidth

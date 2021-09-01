@@ -66,7 +66,7 @@ export const usePost = () => useContext(PostContext)
 // Context Provider component that wraps app and makes post object
 // available to any child component that calls the usePost() hook.
 export function PostProvider({ children }) {
-    const {currentUser, getUserByEmail} = useAuth()
+    const {currentUser, getUserById} = useAuth()
 
     /* Ref used to monitor currentUser state changes for user delete purposes */
     const ref = useRef({});
@@ -88,9 +88,9 @@ export function PostProvider({ children }) {
     /* Monitor currentUser for onDelete action */
     useEffect(() => {
         if (!currentUser
-            && prevCurrentUser?.email
-            && !getUserByEmail(prevCurrentUser?.email)
-        ) dispatchPostsDeleteAllFromUser(prevCurrentUser.email)
+            && prevCurrentUser?.id
+            && !getUserById(prevCurrentUser?.id)
+        ) dispatchPostsDeleteAllFromUser(prevCurrentUser.id)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentUser]);
 

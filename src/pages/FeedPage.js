@@ -45,7 +45,7 @@ export default function FeedPage() {
     const classes = useStyles();
     const {enqueueSnackbar} = useSnackbar()
     const {posts, postCreate, postUpdate, postDelete} = usePost();
-    const {currentUser, getUserById, getCurrentUserInitials, getUserFullName} = useAuth();
+    const {currentUser, getUserById, getUserInitials, getUserFullName} = useAuth();
 
     /* Reset page to window top on route */
     React.useEffect(() => {
@@ -150,7 +150,7 @@ export default function FeedPage() {
                             <PostCard
                                 id={ele.id}
                                 avatar={avatar}
-                                initials={getCurrentUserInitials(user)}
+                                initials={getUserInitials(user)}
                                 editControls={currentUser.id === ele.userId}
                                 header={getUserFullName(user)}
                                 date={ele.postDate}
