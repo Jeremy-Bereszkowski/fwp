@@ -24,12 +24,14 @@ import {usePost} from "../Providers/PostProvider";
 
 const useStyles = makeStyles((theme) => ({
     editButton: {
+        transition: `${theme.transitions.duration.standard}ms`,
         color: theme.palette.text.secondary,
         "&:hover": {
             color: theme.palette.info.main,
         }
     },
     deleteButton: {
+        transition: `${theme.transitions.duration.standard}ms`,
         color: theme.palette.text.secondary,
         "&:hover": {
             color: theme.palette.error.main,

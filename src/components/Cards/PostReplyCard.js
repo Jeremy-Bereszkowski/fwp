@@ -9,12 +9,15 @@ import {
     Divider,
     makeStyles,
     OutlinedInput,
+    Tooltip,
     Typography,
 } from "@material-ui/core";
+import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
+import EditIcon from '@material-ui/icons/Edit';
 
 import {usePost} from "../Providers/PostProvider";
 import {useAuth} from "../Providers/AuthProvider";
-
+import ReplyCardBody from "./CardBody/ReplyCardBody";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -25,7 +28,9 @@ const useStyles = makeStyles((theme) => ({
         padding: `${theme.spacing(1)}!important`,
     },
     flexBox: {
-        display: "flex"
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center"
     },
     nameText: {
         marginRight: theme.spacing(1),
@@ -43,14 +48,32 @@ const useStyles = makeStyles((theme) => ({
     button: {
         marginLeft: theme.spacing(4)
     },
+    replyEdit: {
+        marginLeft: theme.spacing(1),
+        transition: `${theme.transitions.duration.standard}ms`,
+        "&:hover": {
+            color: theme.palette.info.main
+        }
+    },
+    replyDelete: {
+        marginLeft: theme.spacing(1),
+        transition: `${theme.transitions.duration.standard}ms`,
+        "&:hover": {
+            color: theme.palette.error.main
+        }
+    },
+    replyTypeContainer: {
+        display: "flex",
+    }
 }));
 
 export default function PostReplyCard({postId, postOwnerName, replies}) {
     const classes = useStyles()
-    const {replyCreate} = usePost()
-    const {getUserById} = useAuth();
+    const {replyCreate, replyDelete} = usePost()
+    const {currentUser, getUserById} = useAuth();
 
     const [reply, setReply] = React.useState('')
+    const [edit, setEdit] = React.useState(false)
 
     const handleReplySet = (event) => setReply(event.target.value)
     const handleReplyReset = () => setReply('')
@@ -62,6 +85,10 @@ export default function PostReplyCard({postId, postOwnerName, replies}) {
 
         replyCreate(reply, postId)
         handleReplyReset()
+    }
+
+    const onDeleteReply = (replyId) => {
+        replyDelete(postId, replyId)
     }
 
     return (
@@ -95,29 +122,12 @@ export default function PostReplyCard({postId, postOwnerName, replies}) {
             {replies.length > 0 && replies.map((ele, key) => {
                 const user = getUserById(ele.userId)
                 return (
-                    <React.Fragment key={ele.replyId}>
-                        <CardContent className={classes.replyCard}>
-                            <div className={classes.flexBox}>
-                                <Typography
-                                    variant={"body2"}
-                                    color={"textPrimary"}
-                                    className={classes.nameText}
-                                >
-                                    {user ? (
-                                        `${user.firstName} ${user.lastName} - `
-                                    ) : (
-                                        `Deleted -`
-                                    )}
-                                </Typography>
-                                <Typography
-                                    variant={"body2"}
-                                    color={"textSecondary"}
-                                    className={classes.bodyText}
-                                >
-                                    {ele.body}
-                                </Typography>
-                            </div>
-                        </CardContent>
+                    <React.Fragment key={ele.id}>
+                        <ReplyCardBody
+                            user={user}
+                            postId={postId}
+                            reply={ele}
+                        />
                         {key !== replies.length - 1 && (
                             <Divider/>
                         )}
