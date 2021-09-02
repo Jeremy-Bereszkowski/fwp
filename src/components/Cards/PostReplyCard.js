@@ -5,15 +5,10 @@ import PropTypes from 'prop-types';
 import {
     Button,
     Card,
-    CardContent,
     Divider,
     makeStyles,
     OutlinedInput,
-    Tooltip,
-    Typography,
 } from "@material-ui/core";
-import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
-import EditIcon from '@material-ui/icons/Edit';
 
 import {usePost} from "../Providers/PostProvider";
 import {useAuth} from "../Providers/AuthProvider";
@@ -69,11 +64,10 @@ const useStyles = makeStyles((theme) => ({
 
 export default function PostReplyCard({postId, postOwnerName, replies}) {
     const classes = useStyles()
-    const {replyCreate, replyDelete} = usePost()
-    const {currentUser, getUserById} = useAuth();
+    const {replyCreate} = usePost()
+    const {getUserById} = useAuth();
 
     const [reply, setReply] = React.useState('')
-    const [edit, setEdit] = React.useState(false)
 
     const handleReplySet = (event) => setReply(event.target.value)
     const handleReplyReset = () => setReply('')
@@ -85,10 +79,6 @@ export default function PostReplyCard({postId, postOwnerName, replies}) {
 
         replyCreate(reply, postId)
         handleReplyReset()
-    }
-
-    const onDeleteReply = (replyId) => {
-        replyDelete(postId, replyId)
     }
 
     return (

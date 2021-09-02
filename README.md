@@ -2,7 +2,7 @@
 ### Jeremy Bereszkowski - s3539822
 
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app) and [Material-UI](https://material-ui.com).
 
 ## Project pages
 
@@ -12,7 +12,8 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
     - Change Password Page
     - Error Page
 
-## Project features 
+## Project features
+
     - Sign up
     - Sign in
     - View account details
@@ -24,6 +25,18 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
     - Edit ones own post
     - Delete ones own post
     - Reply to a post
+
+    - Users and posts stored in LocalStorage 
+    - Current user stored in SessionStorage
+    - Images stored in Firebase Storage
+    
+    - Responsive page design
+    - System synced dark theme
+
+## Demo
+
+A demo of the project is available here: [Vibe Check](https://fwp-zeta.vercel.app).
+
 
 ## Available Scripts
 

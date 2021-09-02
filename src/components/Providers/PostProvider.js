@@ -17,7 +17,6 @@ const DISPATCH_POST_EDIT = 'edit'
 const DISPATCH_POST_DELETE = 'delete'
 const DISPATCH_POST_DELETE_ALL_FROM_USER = 'delete-from-user'
 const DISPATCH_REPLY_ADD = 'reply-add'
-const DISPATCH_REPLY_EDIT = 'reply-edit'
 const DISPATCH_REPLY_DELETE = 'reply-delete'
 
 /* post state init */
@@ -33,13 +32,6 @@ const postReducer = (posts, action) => {
         case DISPATCH_REPLY_ADD: {
             const post = posts.find(ele => ele.id === action.payload.id)
             post.replies.push(action.payload.reply)
-            return [...posts.filter(ele => ele.id !== action.payload.id), post]
-        }
-        case DISPATCH_REPLY_EDIT: {
-            const post = posts.find(ele => ele.id === action.payload.postId)
-            const reply = post.replies.find(ele => ele.id === action.payload.replyId)
-            reply.body = action.payload.body
-            post.replies = [...post.replies.filter(ele => ele.id !== action.payload.replyId), reply]
             return [...posts.filter(ele => ele.id !== action.payload.id), post]
         }
         case DISPATCH_REPLY_DELETE: {
@@ -99,7 +91,6 @@ export function PostProvider({ children }) {
     const dispatchPostsDelete = (id) => dispatchPosts({type: DISPATCH_POST_DELETE, payload: id})
     const dispatchPostsDeleteAllFromUser = (userId) => dispatchPosts({type: DISPATCH_POST_DELETE_ALL_FROM_USER, payload: userId})
     const dispatchReplyAdd = (postId, reply) => dispatchPosts({type: DISPATCH_REPLY_ADD, payload: {id: postId, reply}})
-    const dispatchReplyEdit = (postId, replyId, body) => dispatchPosts({type: DISPATCH_REPLY_EDIT, payload: {postId, replyId, body}})
     const dispatchReplyDelete = (postId, replyId) => dispatchPosts({type: DISPATCH_REPLY_DELETE, payload: {postId, replyId}})
 
     /* Monitor currentUser for onDelete action */
@@ -146,10 +137,6 @@ export function PostProvider({ children }) {
         if (postId && body) dispatchReplyAdd(postId, replyObject(currentUser.id, body))
     }
 
-    const replyEdit = (postId, replyId, body) => {
-        if (postId && body) dispatchReplyEdit(postId, replyId, body)
-    }
-
     const replyDelete = (postId, replyId) => {
         if (postId && replyId) dispatchReplyDelete(postId, replyId)
     }
@@ -160,7 +147,6 @@ export function PostProvider({ children }) {
         postUpdate,
         postDelete,
         replyCreate,
-        replyEdit,
         replyDelete,
     }
 
