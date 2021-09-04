@@ -80,9 +80,18 @@ export default function AvatarPanelBottomSection({onClick}) {
                 variant={"h4"}
                 component={"p"}
                 color={"textSecondary"}
+                gutterBottom
             >
                 Image:
             </Typography>
+            <Typography
+                color={"error"}
+                variant={"body2"}
+                align={"left"}
+            >
+                Max. upload size of 3MB
+            </Typography>
+
             <Grid
                 container
                 justifyContent={"space-between"}
